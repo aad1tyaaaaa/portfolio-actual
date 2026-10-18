@@ -51,3 +51,20 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100vh;min-height:680px;posi
 .skills>h2{z-index:1}.skills .deco{pointer-events:none;width:clamp(72px,9vw,140px);animation:sk-fade .8s ease both,sk-float 6s ease-in-out infinite alternate}.skills .sk-tl{rotate:-14deg}.skills .sk-tr{rotate:12deg;animation-delay:0s,-1.5s}.skills .sk-bl{rotate:10deg;animation-delay:0s,-3s}.skills .sk-br{rotate:-10deg;animation-delay:0s,-4.5s}@keyframes sk-float{to{translate:0 -14px}}@media(prefers-reduced-motion:reduce){.skills .deco{animation:sk-fade .8s ease both}}.sk-tl{top:4%;left:4%}.sk-tr{top:6%;right:5%}.sk-bl{bottom:6%;left:6%}.sk-br{bottom:4%;right:4%}@keyframes sk-fade{from{opacity:0}}
 .skills{height:100dvh;min-height:520px;padding:clamp(32px,6vh,72px) clamp(24px,4vw,64px) clamp(16px,3vh,40px);gap:clamp(8px,2vh,24px)}.skills>h2{font-size:min(clamp(3rem,12vw,10rem),15vh);padding:0 .12em}.skills-fit{flex:1;min-height:0;width:100%;container-type:size;display:grid;place-items:center;position:relative;z-index:1}
 @media(max-width:640px){.skills .deco{width:64px}}
+
+/* hero contact button: rotating holographic gradient layers */
+.btn-wrapper{--rad:32px;--color-wrapper-border:#fff;--color-btn-bg:#f00;--color-btn-text:#000;--color-btn-text-shadow:#fff;--color-btn-inset-shadow:#558;--color-layer-a:#fff;--color-layer-b:#00f;--color-overlay-text:#000;--color-overlay-glow:#fff;--color-overlay-shadow:#0004;--color-overlay-highlight:#fff5;position:relative;display:flex;align-items:center;justify-content:center;overflow:clip;overflow-clip-margin:4px;border:2px solid var(--color-wrapper-border);border-radius:var(--rad);font-family:inherit;font-size:clamp(.75rem,1vw,1rem);font-weight:600;filter:saturate(.65) brightness(1.8)}
+.gradient-btn{position:relative;z-index:-1;display:inline-block;padding:11px 28px;border:none;border-radius:var(--rad);font-family:inherit;font-size:inherit;font-weight:inherit;letter-spacing:.16em;color:var(--color-btn-text);background-color:var(--color-btn-bg);background-size:200% 200%;box-shadow:inset 0 0 10px 9px var(--color-btn-inset-shadow);text-shadow:0 1px 3px var(--color-btn-text-shadow);cursor:pointer;mix-blend-mode:color-dodge;transition:color .3s ease,text-shadow .3s ease}
+.gradient-btn::after{content:"";position:absolute;pointer-events:none;left:0;top:0;width:100%;height:100%;border-radius:var(--rad);background-size:200% 200%;mix-blend-mode:difference;z-index:1}
+.gradient-layer{position:absolute;pointer-events:none;left:-160px;width:500%;aspect-ratio:1;background:radial-gradient(ellipse at 65% 180%,var(--color-layer-a),var(--color-layer-b),var(--color-layer-a),var(--color-layer-b),var(--color-layer-a),var(--color-layer-b),var(--color-layer-a),var(--color-layer-b),var(--color-layer-a),var(--color-layer-b),var(--color-layer-a));mix-blend-mode:difference;animation:cb-rotate 8s linear infinite}
+@keyframes cb-rotate{to{transform:rotate(360deg)}}
+.text-overlay{position:absolute;pointer-events:none;z-index:2;padding:11px 28px;border-radius:var(--rad);font-family:inherit;font-size:inherit;font-weight:inherit;letter-spacing:.16em;color:var(--color-overlay-text);text-shadow:0 0 4px var(--color-overlay-glow);box-shadow:inset 0 -4px 4px 0 var(--color-overlay-shadow),inset 0 4px 4px 0 var(--color-overlay-highlight);mix-blend-mode:multiply;transition:transform .3s ease;animation:cb-opacity-pulse 5s ease infinite}
+.btn-wrapper:hover .text-overlay{transform:scale(1.1)}
+.btn-wrapper:active .text-overlay{transform:scale(.95)}
+.btn-wrapper:hover .gradient-btn,.btn-wrapper:active .gradient-btn{color:#0000;text-shadow:0 0 0 #0000}
+.btn-wrapper:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.light{position:absolute;pointer-events:none;z-index:1;border-radius:50px;width:80%;height:1.3em;background-color:#fff5;filter:blur(5px);animation:cb-pulse 3s ease-in-out infinite}
+@keyframes cb-pulse{0%,100%{opacity:1}50%{opacity:.1}}
+@keyframes cb-opacity-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@media(max-width:767px){.gradient-btn,.text-overlay{padding:9px 20px}}
+@media(prefers-reduced-motion:reduce){.gradient-layer,.light,.text-overlay{animation:none}}
