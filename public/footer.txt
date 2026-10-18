@@ -1,0 +1,44 @@
+## Google Flow — Video Edit Prompt
+
+Edit the provided video while preserving its original Renaissance artwork, characters, objects, colors, layout, and cinematic style.
+
+### 1. Camera and composition
+- Keep the camera **locked in the original composition for the entire video**.
+- Remove all upward camera movements, vertical scrolling, panning, and reframing.
+- Do not move the artwork upward or downward at any point.
+- Maintain the original positions of the scholars, laptop, desk, and objects.
+- Retain only extremely subtle 2.5D parallax and gentle micro-movements that do not shift the overall composition.
+- The video should feel like a living Renaissance poster, not a scrolling webpage.
+
+### 2. AI object-detection overlays
+Replace generic detection labels with the following exact names:
+
+- `PERSON_01` → **Galileo Galilei**
+- `PERSON_02` → **Albert Einstein**
+- `PERSON_03` → **Isaac Newton**
+
+Display each name in a small, elegant white technical label next to the corresponding scholar. Use thin bounding boxes, corner markers, tracking points, and subtle scanning lines to create the appearance of an AI computer-vision detection system.
+
+Keep the labels readable, correctly spelled, and visually connected to their respective subjects. Keep the detection overlays stable and aligned with the figures throughout the video.
+
+### 3. Portfolio title
+Replace the existing text `Amnar Viefutice` with the exact text:
+
+**Aaditya Jaiswar**
+
+Preserve the existing title's placement, elegant typography, white color, and editorial aesthetic. Do not introduce any alternative spellings or additional names.
+
+### 4. Preserve the original art direction
+Retain the deep-red background, detailed Renaissance painting, warm brown and gold tones, central silver laptop, wooden desk, books, parchment, scientific instruments, subtle film grain, and minimal white HUD elements.
+
+Keep the animation slow, restrained, and sophisticated. Do not add new characters, objects, or unnecessary visual effects.
+
+### 5. Strict constraints
+- No vertical scrolling or upward camera movement.
+- No zooming or reframing that changes the overall composition.
+- No random text or misspelled labels.
+- No character morphing or object deformation.
+- No changes to the original artwork beyond the requested text and detection-label edits.
+- Maintain the original 16:9 format, duration, and visual continuity.
+
+**Final result:** The same Renaissance-inspired motion-design video, with a fixed composition, correctly named historical figures, visible AI detection overlays, and the portfolio title “Aaditya Jaiswar.”
