@@ -68,3 +68,4 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 @keyframes cb-rotate{to{rotate:360deg}}
 @media(max-width:767px){.contact-cta{padding:10px 20px}}
 @media(prefers-reduced-motion:reduce){.contact-cta::before{animation:none}}
+.exp-fade{animation:exp-fade .6s ease both}@keyframes exp-fade{from{opacity:0;translate:0 10px}}@media(prefers-reduced-motion:reduce){.exp-fade{animation:none}}
