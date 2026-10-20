@@ -9,7 +9,6 @@ const nextConfig = {
   async rewrites() {
     return [
       { source: '/contact', destination: '/contact.html' },
-      { source: '/resume', destination: '/resume.pdf' },
     ]
   },
   async redirects() {
