@@ -6,6 +6,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    agentUpgrade: 'security',
+  },
   async rewrites() {
     return [
       { source: '/contact', destination: '/contact.html' },
