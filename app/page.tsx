@@ -6,6 +6,7 @@ import { ArrowUpRight } from 'lucide-react'
 import SkillBubbles from '@/components/SkillBubbles'
 import GooeyNav from '@/components/GooeyNav'
 import FlowingMenu from '@/components/FlowingMenu'
+import { projects } from '@/lib/projects'
 
 const decor = {
   moon: 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png',
@@ -17,19 +18,12 @@ const skillDecor = { robot: '/icons/icon1.png', gamepad: '/icons/icon2.png', dat
 const gifs = [
   'hero-space-voyage-preview-eECLH3Yc.gif','hero-codenest-preview-Cgppc2qV.gif','hero-vex-ventures-preview-BczMFIiw.gif','hero-stellar-ai-v2-preview-DjvxjG3C.gif','hero-asme-preview-B_nGDnTP.gif','hero-transform-data-preview-Cx5OU29N.gif','hero-vitara-preview-Cjz2QYyU.gif','hero-terra-preview-BFjrCr7T.gif','hero-skyelite-preview-DHaZIgUv.gif','hero-aethera-preview-DknSlcTa.gif','hero-designpro-preview-D8c5_een.gif','hero-stellar-ai-preview-D3HL6bw1.gif','hero-xportfolio-preview-D4A8maiC.gif','hero-orbit-web3-preview-BXt4OttD.gif','hero-nexora-preview-cx5HmUgo.gif','hero-evr-ventures-preview-DZxeVFEX.gif','hero-planet-orbit-preview-DWAP8Z1P.gif','hero-new-era-preview-CocuDUm9.gif','hero-wealth-preview-B70idl_u.gif','hero-luminex-preview-CxOP7ce6.gif','hero-celestia-preview-0yO3jXO8.gif',
 ].map((name) => `https://motionsites.ai/assets/${name}`)
-const projects = [
-  ['01','Security · Developer Tools','Provenyx Security','https://provenyx.vercel.app/','Live Project'],
-  ['02','AI · Observability','Black Box','https://blackbox-five-alpha.vercel.app/','Live Project'],
-  ['03','Quantum ML · Geospatial','TerraQ','https://terra-q-seven.vercel.app/','Live Project'],
-  ['04','AI · Multi-Agent','Negotiara AI','https://negotiara-main.vercel.app/','Live Project'],
-  ['05','Web · Non-Profit','Parth NGO','https://parth-ngo-main.vercel.app/','Live Project'],
-] as const
 
 function FadeIn({ children, delay=0, x=0, y=30, className='' }: { children: React.ReactNode; delay?: number; x?: number; y?: number; className?: string }) {
   return <motion.div className={className} initial={{ opacity: 0, x, y }} whileInView={{ opacity: 1, x: 0, y: 0 }} viewport={{ once: true, margin: '50px', amount: 0 }} transition={{ delay, duration: .7, ease: [.25,.1,.25,1] }}>{children}</motion.div>
 }
 function ContactButton() { return <a href="/contact" className="contact-cta">CONTACT ME <span aria-hidden="true">↗</span></a> }
-const navItems=[{label:'Services',href:'#services'},{label:'Experience',href:'/experience'},{label:'Achievements',href:'/achievements'},{label:'Education',href:'/education'},{label:'Projects',href:'#projects'},{label:'Resume',href:'/resume'}]
+const navItems=[{label:'Services',href:'#services'},{label:'Experience',href:'/experience'},{label:'Achievements',href:'/achievements'},{label:'Education',href:'/education'},{label:'Projects',href:'/projects'},{label:'Resume',href:'/resume'}]
 const navDrops=['#b600a8','#7621b0','#f6e6f8']
 const navTheme={'--gn-ink':'#fff','--gn-muted':'#fff'} as React.CSSProperties
 // let the goo travel to the clicked item before leaving; plain/modified clicks and new-tab links pass through
