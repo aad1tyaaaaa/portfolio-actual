@@ -1,0 +1,291 @@
+/*
+ * Astronaut — designed by Aaditya Jaiswar
+ * LinkedIn  https://www.linkedin.com/in/aadityaaaaa
+ * GitHub    https://github.com/aad1tyaaaaa
+ * Dribbble  https://dribbble.com/aadityaaaaa-jaiswar
+ * Email     aadityaaaaa.jaiswar@gmail.com
+ * WhatsApp  https://wa.me/917710024884
+ */
+/* self-contained 220px space tile; everything scoped under .astronaut-space so .head/.body/.arm can't leak */
+.astronaut-space {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 40%, #1b2140 0%, #0b0d1c 70%);
+}
+
+.astronaut-space .star-box {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  top: -60px;
+  width: 100%;
+  height: 100%;
+}
+
+.astronaut-space .star-box1 { animation: astro-snow 5s linear infinite; }
+.astronaut-space .star-box2 { animation: astro-snow 5s -1.64s linear infinite; }
+.astronaut-space .star-box3 { animation: astro-snow 5s -2.3s linear infinite; }
+.astronaut-space .star-box4 { animation: astro-snow 5s -3.3s linear infinite; }
+
+.astronaut-space .star {
+  position: absolute;
+  z-index: 10;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: #fff;
+  opacity: 0.7;
+}
+
+.astronaut-space .star::before,
+.astronaut-space .star::after {
+  content: '';
+  position: absolute;
+  z-index: 10;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.astronaut-space .star::before {
+  top: 40px;
+  left: 35px;
+  width: 4px;
+  height: 4px;
+  opacity: 0.7;
+}
+
+.astronaut-space .star::after {
+  top: 8px;
+  left: 80px;
+  width: 5px;
+  height: 5px;
+  opacity: 0.9;
+}
+
+.astronaut-space .star-position1 { top: 30px; left: 6px; }
+.astronaut-space .star-position2 { top: 110px; left: 40px; }
+.astronaut-space .star-position3 { top: 60px; left: 85px; }
+.astronaut-space .star-position4 { top: 120px; left: 125px; }
+.astronaut-space .star-position5 { top: 20px; left: 150px; }
+.astronaut-space .star-position6 { top: 90px; left: 180px; }
+.astronaut-space .star-position7 { top: 30px; left: 205px; }
+
+.astronaut-space .astronaut {
+  position: absolute;
+  z-index: 11;
+  top: calc(50% - 150px);
+  left: calc(50% - 125px);
+  width: 250px;
+  height: 300px;
+  scale: 0.6;
+  animation: astro-spin 5s linear infinite;
+}
+
+.astronaut-space .schoolbag {
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 75px);
+  left: calc(50% - 50px);
+  width: 100px;
+  height: 150px;
+  background-color: #94b7ca;
+  border-radius: 50px 50px 0 0 / 30px 30px 0 0;
+}
+
+.astronaut-space .head {
+  position: absolute;
+  z-index: 3;
+  top: 34px;
+  left: calc(50% - 47.5px);
+  width: 97px;
+  height: 80px;
+  background: linear-gradient(to right, #e3e8eb 0%, #e3e8eb 50%, #fbfdfa 50%, #fbfdfa 100%);
+  border-radius: 50%;
+}
+
+.astronaut-space .head::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 25px);
+  left: calc(50% - 30px);
+  width: 60px;
+  height: 50px;
+  background: linear-gradient(to bottom, #15aece 0%, #15aece 50%, #0391bf 50%, #0391bf 100%);
+  border-radius: 15px;
+}
+
+.astronaut-space .head::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 12.5px);
+  left: -4px;
+  width: 12px;
+  height: 25px;
+  background-color: #618095;
+  border-radius: 5px;
+  box-shadow: 92px 0px 0px #618095;
+}
+
+.astronaut-space .body {
+  position: absolute;
+  z-index: 2;
+  top: 105px;
+  left: calc(50% - 41px);
+  width: 85px;
+  height: 100px;
+  background: linear-gradient(to right, #e3e8eb 0%, #e3e8eb 50%, #fbfdfa 50%, #fbfdfa 100%);
+  border-radius: 40px / 20px;
+}
+
+.astronaut-space .panel {
+  position: absolute;
+  top: 20px;
+  left: calc(50% - 30px);
+  width: 60px;
+  height: 40px;
+  background-color: #b7cceb;
+}
+
+.astronaut-space .panel::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 7px;
+  width: 30px;
+  height: 5px;
+  background-color: #fbfdfa;
+  box-shadow: 0px 9px 0px #fbfdfa, 0px 18px 0px #fbfdfa;
+}
+
+.astronaut-space .panel::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  background-color: #fbfdfa;
+  border-radius: 50%;
+  box-shadow: 0px 14px 0px 2px #fbfdfa;
+}
+
+.astronaut-space .arm {
+  position: absolute;
+  z-index: 2;
+  top: 121px;
+  width: 80px;
+  height: 30px;
+}
+
+.astronaut-space .arm-left {
+  left: 30px;
+  background-color: #e3e8eb;
+  border-radius: 0 0 0 39px;
+}
+
+.astronaut-space .arm-right {
+  right: 30px;
+  background-color: #fbfdfa;
+  border-radius: 0 0 39px 0;
+}
+
+.astronaut-space .arm-left::before,
+.astronaut-space .arm-right::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  width: 30px;
+  height: 70px;
+}
+
+.astronaut-space .arm-left::before {
+  left: 0;
+  background-color: #e3e8eb;
+  border-radius: 50px 50px 0px 120px / 50px 50px 0 110px;
+}
+
+.astronaut-space .arm-right::before {
+  right: 0;
+  background-color: #fbfdfa;
+  border-radius: 50px 50px 120px 0 / 50px 50px 110px 0;
+}
+
+.astronaut-space .arm-left::after,
+.astronaut-space .arm-right::after {
+  content: '';
+  position: absolute;
+  top: -24px;
+  width: 30px;
+  height: 10px;
+}
+
+.astronaut-space .arm-left::after {
+  left: 0;
+  background-color: #6e91a4;
+}
+
+.astronaut-space .arm-right::after {
+  right: 0;
+  background-color: #b6d2e0;
+}
+
+.astronaut-space .leg {
+  position: absolute;
+  z-index: 2;
+  bottom: 70px;
+  width: 30px;
+  height: 40px;
+}
+
+.astronaut-space .leg-left {
+  left: 76px;
+  background-color: #e3e8eb;
+  transform: rotate(20deg);
+}
+
+.astronaut-space .leg-right {
+  right: 73px;
+  background-color: #fbfdfa;
+  transform: rotate(-20deg);
+}
+
+.astronaut-space .leg-left::before,
+.astronaut-space .leg-right::before {
+  content: '';
+  position: absolute;
+  bottom: -26px;
+  width: 50px;
+  height: 25px;
+}
+
+.astronaut-space .leg-left::before {
+  left: -20px;
+  background-color: #e3e8eb;
+  border-radius: 30px 0 0 0;
+  border-bottom: 10px solid #6d96ac;
+}
+
+.astronaut-space .leg-right::before {
+  right: -20px;
+  background-color: #fbfdfa;
+  border-radius: 0 30px 0 0;
+  border-bottom: 10px solid #b0cfe4;
+}
+
+@keyframes astro-snow {
+  0% { opacity: 0; transform: translateY(0px); }
+  20% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(260px); }
+}
+
+@keyframes astro-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astronaut-space * { animation: none !important; }
+}

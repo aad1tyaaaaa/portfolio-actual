@@ -12,6 +12,10 @@ import AiBlob from '@/components/AiBlob'
 import ToyCamera from '@/components/ToyCamera'
 import OrbitSphere from '@/components/OrbitSphere'
 import CuteGhost from '@/components/CuteGhost'
+import HamsterWheel from '@/components/HamsterWheel'
+import ShadowWalker from '@/components/ShadowWalker'
+import Astronaut from '@/components/Astronaut'
+import PixelTorch from '@/components/PixelTorch'
 import { projects } from '@/lib/projects'
 import { characters } from '@/lib/characters'
 import { badges } from '@/lib/badges'
@@ -114,7 +118,7 @@ const exploreItems=[
   {text:'the character i design',link:'/characters',images:characters.map(c=>c.thumb),meta:`${characters.length} characters`},
   {text:'the animation i design',link:'/animations',images:animations.map(a=>a.thumb),imageShape:'landscape' as const,meta:`${animations.length} animations`},
   {text:'the UI i design',link:'/ui',images:uiDesigns.map(d=>d.thumb),imageShape:'landscape' as const,meta:`${uiDesigns.length} designs`},
-  {text:'the component i design',link:'/components',nodes:[<WashingMachine key="wm"/>,<PixelGhost key="pg"/>,<AiBlob key="ai" size={200}/>,<ToyCamera key="tc"/>,<OrbitSphere key="os"/>,<CuteGhost key="cg"/>],meta:'6 components'},
+  {text:'the component i design',link:'/components',nodes:[<WashingMachine key="wm"/>,<PixelGhost key="pg"/>,<AiBlob key="ai" size={200}/>,<ToyCamera key="tc"/>,<OrbitSphere key="os"/>,<CuteGhost key="cg"/>,<HamsterWheel key="hw"/>,<ShadowWalker key="sw"/>,<Astronaut key="as"/>,<PixelTorch key="pt"/>],meta:'10 components'},
   {text:'the badges i design',link:'/badges',images:badges.map(b=>b.thumb),imageShape:'circle' as const,meta:`${badges.length} badges`},
 ]
 function Explore(){return <section className="explore" id="explore"><FadeIn><h2 className="hero-heading">Explore</h2></FadeIn><div className="explore-menu"><FlowingMenu items={exploreItems} speed={60} stretch={.6} magnet={.25} followCursor={.4} showIndex showArrow textColor="#d7e2ea" bgColor="#0c0c0c" marqueeBgColor="#e28bed" marqueeTextColor="#0c0c0c" borderColor="#d7e2ea22" ariaLabel="Explore the site" /></div></section>}

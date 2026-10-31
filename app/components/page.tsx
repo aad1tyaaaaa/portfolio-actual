@@ -8,6 +8,10 @@ import AiBlob from '@/components/AiBlob'
 import ToyCamera from '@/components/ToyCamera'
 import OrbitSphere from '@/components/OrbitSphere'
 import CuteGhost from '@/components/CuteGhost'
+import HamsterWheel from '@/components/HamsterWheel'
+import ShadowWalker from '@/components/ShadowWalker'
+import Astronaut from '@/components/Astronaut'
+import PixelTorch from '@/components/PixelTorch'
 
 const showcase = [
   { name: 'Washing Machine', files: ['WashingMachine.jsx', 'WashingMachine.css'], preview: <WashingMachine /> },
@@ -16,6 +20,11 @@ const showcase = [
   { name: 'Toy Camera', files: ['ToyCamera.jsx', 'ToyCamera.css'], preview: <ToyCamera /> },
   { name: 'Orbit Sphere', files: ['OrbitSphere.jsx', 'OrbitSphere.css'], preview: <OrbitSphere /> },
   { name: 'Cute Ghost', files: ['CuteGhost.jsx', 'CuteGhost.css'], preview: <CuteGhost /> },
+  { name: 'Hamster Wheel', files: ['HamsterWheel.jsx', 'HamsterWheel.css'], preview: <HamsterWheel /> },
+  // dark creature: needs a light backdrop to read
+  { name: 'Shadow Walker', files: ['ShadowWalker.jsx', 'ShadowWalker.css'], preview: <ShadowWalker />, bg: '#e9e4f0' },
+  { name: 'Astronaut', files: ['Astronaut.jsx', 'Astronaut.css'], preview: <Astronaut /> },
+  { name: 'Pixel Torch', files: ['PixelTorch.jsx', 'PixelTorch.css'], preview: <PixelTorch /> },
 ]
 
 const socials = [
@@ -41,7 +50,7 @@ export default function Components() {
               <h2 className="text-2xl font-semibold">{c.name}</h2>
               <p className="text-sm text-[#d7e2ea]/60">designed by <span className="text-[#e28bed]">Aaditya Jaiswar</span></p>
             </div>
-            <div className="mt-6 grid h-72 place-items-center rounded-2xl bg-[#141414]">{c.preview}</div>
+            <div className="mt-6 grid h-72 place-items-center rounded-2xl bg-[#141414]" style={c.bg ? { background: c.bg } : undefined}>{c.preview}</div>
             {c.files.map(f => {
               const code = source(f)
               return (
