@@ -287,6 +287,23 @@ class MorphEngine {
 
   loadTextures() {
     this.items.forEach((item, index) => {
+      // .mp4 slides: muted looping video, re-uploaded to the GPU every frame in loop()
+      if (item.image.endsWith('.mp4')) {
+        const video = Object.assign(document.createElement('video'), { src: item.image, muted: true, loop: true, playsInline: true, autoplay: true });
+        video.onloadeddata = () => {
+          const texture = new Texture(this.gl, { generateMipmaps: false });
+          texture.image = video;
+          this.textures[index] = texture;
+          this.sizes[index] = [video.videoWidth || 1, video.videoHeight || 1];
+          (this.videos ??= []).push(video);
+          if (index === this.current) {
+            this.program.uniforms.tCurrent.value = texture;
+            this.program.uniforms.uCurrentSize.value = this.sizes[index];
+          }
+        };
+        video.play().catch(() => {});
+        return;
+      }
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = item.image;
@@ -325,6 +342,7 @@ class MorphEngine {
   loop(t) {
     this.program.uniforms.uTime.value = t * 0.001;
     if (!this.dragging && !this.animating) this.syncOptions();
+    this.textures.forEach(tex => { if (tex?.image instanceof HTMLVideoElement) tex.needsUpdate = true; });
     this.renderer.render({ scene: this.mesh });
     this.raf = requestAnimationFrame(this.boundLoop);
   }
@@ -461,6 +479,7 @@ class MorphEngine {
 
   destroy() {
     cancelAnimationFrame(this.raf);
+    this.videos?.forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
     if (this.tween) this.tween.kill();
     this.resizeObserver.disconnect();
     this.canvas.removeEventListener('webglcontextlost', this.boundContextLost);

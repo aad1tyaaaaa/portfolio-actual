@@ -6,22 +6,15 @@ import BackButton from '@/components/BackButton'
 import LetterSwap from '@/components/LetterSwap'
 
 const achievements = [
-  { rank: '1st Place', event: 'National-Level Hackathon', note: 'Won a ₹1 Lakh cash prize for ArogyaSense, an AI-integrated mobile health ecosystem.' },
-  { rank: '2nd Runner-Up', event: 'DEEP BLUE Hackathon', note: 'National-level hackathon (Mastek-Majesco Season 10) for an AI-based food freshness detection system.' },
+  { rank: '1st Place', event: 'Periscope Technologies', media: '/achievement/1st.mp4', note: 'Won a ₹1 Lakh cash prize for ArogyaSense, an AI-integrated mobile health ecosystem.' },
+  { rank: '2nd Runner-Up', event: 'DEEP BLUE Hackathon', media: '/achievement/2nd.jpg', certificate: '/achievement/2nd%20mastek.pdf', note: 'National-level hackathon (Mastek-Majesco Season 10) for an AI-based food freshness detection system.' },
   { rank: 'Top 5 Finalist', event: 'CODEASTRA 2.0', note: 'Secured a top 5 finalist position at MCA-RGIT’s CODEASTRA 2.0.' },
   { rank: 'Top 10 Finalist', event: 'SAKEC CREATHON 2025', note: 'Secured a top 10 finalist position in SAKEC’s CREATHON 2025 hackathon.' },
-  { rank: 'Top 20 Finalist', event: 'Somaiya Riidl Hackathon', note: 'Secured a top 20 finalist position at the Somaiya Riidl Hackathon.' },
+  { rank: 'Top 20 Finalist', event: 'Somaiya Riidl Hackathon', media: '/achievement/5th.jpg', note: 'Secured a top 20 finalist position at the Somaiya Riidl Hackathon.' },
 ]
 
-// ponytail: stock React Bits images until real event photos land in /public/achievements
-const photos = [
-  'https://images.unsplash.com/photo-1782977389500-dd7adad33ebe?q=80&w=1600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1781499455083-6ccc3beb20cd?q=80&w=1600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1776394254711-4a0d7345269a?q=80&w=1600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1781242629922-6f39cc3671cd?q=80&w=1600&auto=format&fit=crop',
-]
 // module-level so the slider's WebGL engine isn't rebuilt every render
-const slides = achievements.map((a, i) => ({ image: photos[i % photos.length], caption: `${a.rank} — ${a.event}` }))
+const slides = achievements.flatMap(a => a.media ? [{ image: a.media, caption: `${a.rank} — ${a.event}` }] : [])
 
 export default function Achievements() {
   return (
@@ -45,6 +38,7 @@ export default function Achievements() {
                   <p className="text-[11px] lg:text-xs uppercase tracking-wider text-[#f6e6f8]/70">{a.rank}</p>
                   <h2 className="text-lg lg:text-2xl leading-tight"><LetterSwap text={a.event} /></h2>
                   <p className="mt-0.5 text-xs lg:text-sm text-white/75">{a.note}</p>
+                  {a.certificate && <a href={a.certificate} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-[#f6e6f8] underline underline-offset-4 hover:text-white">view certificate ↗</a>}
                 </div>
               </li>
             ))}

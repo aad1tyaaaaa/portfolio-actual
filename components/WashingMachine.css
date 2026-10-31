@@ -1,0 +1,77 @@
+/*
+ * WashingMachine — designed by Aaditya Jaiswar
+ * LinkedIn  https://www.linkedin.com/in/aadityaaaaa
+ * GitHub    https://github.com/aad1tyaaaaa
+ * Dribbble  https://dribbble.com/aadityaaaaa-jaiswar
+ * Email     aadityaaaaa.jaiswar@gmail.com
+ * WhatsApp  https://wa.me/917710024884
+ */
+.washing-machine {
+  width: 120px;
+  height: 150px;
+  background-color: #171717;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(#383838 50%, #242424 51%),
+    linear-gradient(#555, #555),
+    linear-gradient(#444, #444),
+    radial-gradient(ellipse at center, #111 25%, #555 26%, #222 50%, #0000 55%),
+    radial-gradient(ellipse at center, #111 25%, #555 26%, #222 50%, #0000 55%),
+    radial-gradient(ellipse at center, #111 25%, #555 26%, #222 50%, #0000 55%);
+  background-position: 0 20px, 45px 0, 8px 6px, 55px 3px, 75px 3px, 95px 3px;
+  background-size: 100% 4px, 1px 23px, 30px 8px, 15px 15px, 15px 15px, 15px 15px;
+  position: relative;
+  border-radius: 6%;
+  border: 1px solid #555;
+  box-shadow: 0 5px 15px #0008;
+  animation: wm-shake 3s ease-in-out infinite;
+  transform-origin: 60px 180px;
+}
+
+.washing-machine::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 100%;
+  width: 7px;
+  height: 5px;
+  background: #444;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 102px 0 #444;
+}
+
+.washing-machine::after {
+  content: '';
+  position: absolute;
+  width: 95px;
+  height: 95px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  bottom: 20px;
+  background-color: #111;
+  background-image:
+    linear-gradient(to right, #0008 0%, #0008 49%, #0000 50%, #0000 100%),
+    linear-gradient(135deg, #777 50%, #292929 51%);
+  background-size: 30px 100%, 90px 80px;
+  border-radius: 50%;
+  background-repeat: repeat, no-repeat;
+  background-position: 0 0;
+  box-sizing: border-box;
+  border: 10px solid #555;
+  box-shadow: 0 0 0 4px #222 inset, 0 0 6px 6px #0008 inset, 0 0 0 1px #888;
+  animation: wm-spin 3s ease-in-out infinite;
+}
+
+@keyframes wm-spin {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(360deg); }
+  75% { transform: rotate(750deg); }
+  100% { transform: rotate(1800deg); }
+}
+
+@keyframes wm-shake {
+  65%, 80%, 88%, 96% { transform: rotate(0.5deg); }
+  50%, 75%, 84%, 92% { transform: rotate(-0.5deg); }
+  0%, 50%, 100% { transform: rotate(0); }
+}

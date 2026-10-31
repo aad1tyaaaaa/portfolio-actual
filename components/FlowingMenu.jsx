@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 // lucide instead of @hugeicons: already a project dependency, same arrow
 import { ArrowUpRight } from 'lucide-react';
 import './FlowingMenu.css';
@@ -22,6 +22,8 @@ const TRACK = 'flowing-menu__track';
 const PART = 'flowing-menu__part';
 const PART_TEXT = 'flowing-menu__part-text';
 const IMAGE = 'flowing-menu__image';
+const NODE = 'flowing-menu__node';
+const NODE_STAGE = 'flowing-menu__node-stage';
 const FLOAT = 'flowing-menu__float';
 const FLOAT_LAYER = 'flowing-menu__float-layer';
 
@@ -36,7 +38,36 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const prefersReduced = () =>
   typeof window !== 'undefined' && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
 
-/** @param {{ items?: Array<{ text: string, link?: string, image?: string, marquee?: string, meta?: string }> } & Record<string, any>} props */
+// one marquee segment (.mp4 images play as silent loops); `images` repeats the label before each image (every segment identical keeps the loop seamless)
+const partContent = item =>
+  item.nodes ? (
+    item.nodes.map((node, i) => (
+      <Fragment key={i}>
+        <span className={PART_TEXT}>{item.marquee ?? item.text}</span>
+        <span className={NODE}>
+          <span className={NODE_STAGE}>{node}</span>
+        </span>
+      </Fragment>
+    ))
+  ) : item.images ? (
+    item.images.map(src => (
+      <Fragment key={src}>
+        <span className={PART_TEXT}>{item.marquee ?? item.text}</span>
+        {src.endsWith('.mp4') ? (
+          <video className={`${IMAGE} ${IMAGE}--${item.imageShape ?? 'portrait'}`} src={src} autoPlay muted loop playsInline />
+        ) : (
+          <span className={`${IMAGE} ${IMAGE}--${item.imageShape ?? 'portrait'}`} style={{ backgroundImage: `url(${src})` }} />
+        )}
+      </Fragment>
+    ))
+  ) : (
+    <>
+      <span className={PART_TEXT}>{item.marquee ?? item.text}</span>
+      {item.image && <span className={IMAGE} style={{ backgroundImage: `url(${item.image})` }} />}
+    </>
+  );
+
+/** @param {{ items?: Array<{ text: string, link?: string, image?: string, images?: string[], nodes?: import('react').ReactNode[], imageShape?: 'portrait' | 'circle' | 'landscape', marquee?: string, meta?: string }> } & Record<string, any>} props */
 function FlowingMenu({
   items = [],
   speed = 60,
@@ -612,8 +643,7 @@ function FlowingMenu({
                 >
                   {Array.from({ length: copies[index] ?? 3 }, (_, copy) => (
                     <div className={PART} key={copy}>
-                      <span className={PART_TEXT}>{item.marquee ?? item.text}</span>
-                      {item.image && <span className={IMAGE} style={{ backgroundImage: `url(${item.image})` }} />}
+                      {partContent(item)}
                     </div>
                   ))}
                 </div>
@@ -648,8 +678,7 @@ function FlowingMenu({
                   {item &&
                     Array.from({ length: copies[slots[slot]] ?? 3 }, (_, copy) => (
                       <div className={PART} key={copy}>
-                        <span className={PART_TEXT}>{item.marquee ?? item.text}</span>
-                        {item.image && <span className={IMAGE} style={{ backgroundImage: `url(${item.image})` }} />}
+                        {partContent(item)}
                       </div>
                     ))}
                 </div>

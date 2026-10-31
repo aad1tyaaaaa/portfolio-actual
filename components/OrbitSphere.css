@@ -1,0 +1,49 @@
+/*
+ * OrbitSphere — designed by Aaditya Jaiswar
+ * LinkedIn  https://www.linkedin.com/in/aadityaaaaa
+ * GitHub    https://github.com/aad1tyaaaaa
+ * Dribbble  https://dribbble.com/aadityaaaaa-jaiswar
+ * Email     aadityaaaaa.jaiswar@gmail.com
+ * WhatsApp  https://wa.me/917710024884
+ */
+.orbit-sphere {
+  --size: 200px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+}
+
+.os-loader,
+.os-ring,
+.os-disc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--size);
+  height: var(--size);
+  transform-style: preserve-3d;
+  perspective: 10000px;
+}
+
+.os-loader {
+  animation: os-tumble 8s linear infinite;
+}
+
+.os-ring {
+  transform: rotate(calc(var(--rot) * 20deg));
+}
+
+.os-disc {
+  border-radius: 50%;
+  background: var(--bg);
+  transform: rotateY(calc(var(--rot-y) * 40deg));
+}
+
+@keyframes os-tumble {
+  0% { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-loader { animation: none; }
+}

@@ -1,0 +1,67 @@
+/*
+ * PixelGhost — designed by Aaditya Jaiswar
+ * LinkedIn  https://www.linkedin.com/in/aadityaaaaa
+ * GitHub    https://github.com/aad1tyaaaaa
+ * Dribbble  https://dribbble.com/aadityaaaaa-jaiswar
+ * Email     aadityaaaaa.jaiswar@gmail.com
+ * WhatsApp  https://wa.me/917710024884
+ */
+.pixel-ghost {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 180px;
+}
+
+.pg-ghost {
+  width: 140px;
+  height: 140px;
+  animation: pg-float 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.5));
+}
+
+.pg-skirt-a { animation: pg-frame 0.4s steps(1) infinite; }
+.pg-skirt-b { animation: pg-frame 0.4s steps(1) infinite reverse; }
+
+.pg-pupils { animation: pg-look 3s steps(1) infinite; }
+
+.pg-shadow {
+  position: absolute;
+  bottom: 0;
+  left: 15%;
+  width: 70%;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #ff1744, #a855f7, #6366f1);
+  filter: blur(14px);
+  animation: pg-shadow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pg-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pg-frame {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* glance right → straight → left, one pixel step at a time */
+@keyframes pg-look {
+  0% { transform: translateX(0); }
+  33% { transform: translateX(-1px); }
+  66% { transform: translateX(-2px); }
+}
+
+@keyframes pg-shadow-pulse {
+  0%, 100% { transform: scale(1.1); opacity: 0.25; }
+  50% { transform: scale(0.85); opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-ghost * { animation: none !important; }
+  .pg-skirt-b { opacity: 0; }
+}

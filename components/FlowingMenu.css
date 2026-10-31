@@ -202,3 +202,55 @@
   container-type: size;
   will-change: transform, opacity;
 }
+
+/* portrait art (e.g. characters) — taller frame so figures aren't cropped to a strip */
+.flowing-menu .flowing-menu__image--portrait {
+  aspect-ratio: 3 / 4;
+  height: calc(84cqh * var(--flowing-menu-band, 1));
+  border-radius: calc(10cqh * var(--flowing-menu-band, 1));
+  background-position: top;
+}
+
+/* round art with transparent corners (e.g. badges) — shown whole, no frame */
+.flowing-menu .flowing-menu__image--circle {
+  aspect-ratio: 1;
+  height: calc(84cqh * var(--flowing-menu-band, 1));
+  border-radius: 999px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* live components (e.g. UI loaders) — drawn on a fixed 220px stage, scaled to the band height.
+   tan(atan2(a, b)) = a / b as a unitless number, so the stage shrinks with the row */
+.flowing-menu__node {
+  position: relative;
+  flex-shrink: 0;
+  height: calc(84cqh * var(--flowing-menu-band, 1));
+  aspect-ratio: 1;
+  margin: 0 calc(3.5cqh * var(--flowing-menu-band, 1));
+}
+
+.flowing-menu__node-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 220px;
+  height: 220px;
+  translate: -50% -50%;
+  scale: 0.5;
+  scale: tan(atan2(calc(84cqh * var(--flowing-menu-band, 1)), 220px));
+}
+
+/* landscape screens (e.g. UI shots) */
+.flowing-menu .flowing-menu__image--landscape {
+  aspect-ratio: 16 / 10;
+  height: calc(84cqh * var(--flowing-menu-band, 1));
+  border-radius: calc(10cqh * var(--flowing-menu-band, 1));
+  background-position: top;
+}
+
+video.flowing-menu__image {
+  object-fit: cover;
+}

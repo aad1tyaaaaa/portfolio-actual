@@ -1,0 +1,163 @@
+/*
+ * CuteGhost — designed by Aaditya Jaiswar
+ * LinkedIn  https://www.linkedin.com/in/aadityaaaaa
+ * GitHub    https://github.com/aad1tyaaaaa
+ * Dribbble  https://dribbble.com/aadityaaaaa-jaiswar
+ * Email     aadityaaaaa.jaiswar@gmail.com
+ * WhatsApp  https://wa.me/917710024884
+ */
+.cute-ghost {
+  --ghost-color: #f4f4ff;
+  --accent: #a78bfa;
+  --dark: #25233a;
+  position: relative;
+  width: 14em;
+  height: 10em;
+  font-size: 15px;
+}
+
+.cg-ghost {
+  position: relative;
+  width: 100%;
+  height: 7.5em;
+  animation: cg-float 1.4s ease-in-out infinite;
+}
+
+.cg-body {
+  position: absolute;
+  left: 4em;
+  top: 0.5em;
+  z-index: 2;
+  width: 6em;
+  height: 6.2em;
+  background: linear-gradient(135deg, #ffffff 0%, var(--ghost-color) 70%, #c9c5ed 100%);
+  border-radius: 3em 3em 1em 1em;
+  box-shadow: 0 0 25px #a78bfa55;
+}
+
+.cg-tail {
+  position: absolute;
+  bottom: -1em;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.cg-tail span {
+  width: 2em;
+  height: 2em;
+  background: #e8e6f8;
+  border-radius: 0 0 50% 50%;
+}
+
+.cg-eyes {
+  position: absolute;
+  top: 2em;
+  left: 1.4em;
+  display: flex;
+  gap: 1.3em;
+}
+
+.cg-eyes span {
+  width: 0.55em;
+  height: 0.8em;
+  background: var(--dark);
+  border-radius: 50%;
+  animation: cg-blink 3s infinite;
+}
+
+.cg-mouth {
+  position: absolute;
+  left: 2.7em;
+  top: 3.2em;
+  width: 0.65em;
+  height: 0.8em;
+  background: var(--dark);
+  border-radius: 50%;
+}
+
+.cg-arm {
+  position: absolute;
+  top: 3em;
+  width: 1.3em;
+  height: 2em;
+  background: #eeecfb;
+  border-radius: 50%;
+}
+
+.cg-arm-left {
+  left: -0.8em;
+  transform: rotate(35deg);
+  animation: cg-wave-left 1.2s ease-in-out infinite;
+}
+
+.cg-arm-right {
+  right: -0.8em;
+  transform: rotate(-35deg);
+  animation: cg-wave-right 1.2s ease-in-out infinite;
+}
+
+.cg-shadow {
+  position: absolute;
+  left: 4.5em;
+  bottom: 0.3em;
+  width: 5em;
+  height: 0.65em;
+  background: #a78bfa44;
+  border-radius: 50%;
+  filter: blur(5px);
+  animation: cg-shadow 1.4s ease-in-out infinite;
+}
+
+.cg-track {
+  position: relative;
+  width: 100%;
+  height: 2.5em;
+  overflow: hidden;
+}
+
+.cg-line {
+  width: 50em;
+  height: 0.5em;
+  border-top: 0.5em dashed var(--accent);
+  animation: cg-move-line 4s linear infinite;
+}
+
+@keyframes cg-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-1em) rotate(3deg); }
+}
+
+@keyframes cg-shadow {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(0.65); opacity: 0.3; }
+}
+
+@keyframes cg-wave-left {
+  0%, 100% { transform: rotate(35deg); }
+  50% { transform: rotate(65deg); }
+}
+
+@keyframes cg-wave-right {
+  0%, 100% { transform: rotate(-35deg); }
+  50% { transform: rotate(-65deg); }
+}
+
+@keyframes cg-blink {
+  0%, 45%, 50%, 100% { transform: scaleY(1); }
+  47%, 49% { transform: scaleY(0.1); }
+}
+
+@keyframes cg-move-line {
+  0% { transform: translateX(0); opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { transform: translateX(-70%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-ghost, .cg-shadow, .cg-arm, .cg-eyes span, .cg-line {
+    animation: none;
+  }
+}
