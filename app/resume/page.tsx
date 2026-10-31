@@ -34,10 +34,7 @@ export default function Resume() {
 
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pt-24 pb-16 sm:px-8 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:gap-16 lg:pt-20">
         <aside className="lg:sticky lg:top-20 lg:self-start lg:pt-6">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] tracking-wide backdrop-blur-md">
-            <span className="size-1.5 rounded-full bg-[#e28bed] shadow-[0_0_10px_#e28bed]" /> updated oct 2026
-          </span>
-          <h1 className="mt-5 font-['Instrument_Serif',serif] text-7xl leading-[.85] italic sm:text-8xl">resume</h1>
+          <h1 className="font-['Instrument_Serif',serif] text-7xl leading-[.85] italic sm:text-8xl">resume</h1>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-[#d7e2ea]/70">
             software engineer across full-stack, AI and cloud. one page, zero fluff.
           </p>
@@ -48,7 +45,6 @@ export default function Resume() {
               Open PDF <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
           </div>
-          <p className="mt-8 hidden text-xs text-[#d7e2ea]/45 lg:block">↳ links on the page are live. hover to spot them.</p>
         </aside>
 
         <figure className="group relative mx-auto w-full max-w-3xl">

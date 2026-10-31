@@ -74,3 +74,4 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 
 .explore{position:relative;padding:clamp(48px,8vh,96px) 0;display:flex;flex-direction:column;align-items:center;gap:clamp(16px,3vh,32px)}.explore-menu{width:100%;height:min(80svh,720px)}
 @media(max-width:767px){.hero-bottom{margin-bottom:calc(var(--wm)*.68 + 3rem);padding-right:0}}
+.resume-intro{position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;object-fit:cover;background:#000;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .6s ease,filter .5s ease}.resume-intro.on{opacity:1;pointer-events:auto}.resume-intro.out{filter:brightness(0)}

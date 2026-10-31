@@ -26,13 +26,25 @@ function ContactButton() { return <a href="/contact" className="contact-cta">CON
 const navItems=[{label:'Services',href:'#services'},{label:'Experience',href:'/experience'},{label:'Achievements',href:'/achievements'},{label:'Education',href:'/education'},{label:'Projects',href:'/projects'},{label:'Resume',href:'/resume'}]
 const navDrops=['#b600a8','#7621b0','#f6e6f8']
 const navTheme={'--gn-ink':'#fff','--gn-muted':'#fff'} as React.CSSProperties
+const resumeIntro='/resume-intro.mp4'
 // let the goo travel to the clicked item before leaving; plain/modified clicks and new-tab links pass through
 const navAfterGoo=(e:React.MouseEvent)=>{
   const a=(e.target as HTMLElement).closest('a')
   if(!a||a.target==='_blank'||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return
   e.preventDefault()
+  const go=()=>{location.href=a.href}
   const wait=matchMedia('(prefers-reduced-motion: reduce)').matches?0:700
-  setTimeout(()=>{location.href=a.href},wait)
+  if(a.pathname!=='/resume'){setTimeout(go,wait);return}
+  // resume: goo first, then a fullscreen intro video that fades in, fades to black, then navigates.
+  // preloads during the goo; click/Esc skips, load/play errors fall through
+  const v=document.createElement('video')
+  v.src=resumeIntro;v.className='resume-intro';v.playsInline=true;v.preload='auto'
+  const end=()=>{v.classList.add('out');setTimeout(go,500)}
+  v.onended=v.onclick=end;v.onerror=go
+  v.onplaying=()=>v.classList.add('on')
+  addEventListener('keydown',ev=>{if(ev.key==='Escape')end()})
+  document.body.append(v)
+  setTimeout(()=>v.play().catch(go),wait)
 }
 // outline = stroked circles under the same circles filled, so only the outer edge shows; tail trails down-left to the head
 const cloud=[[200,80,45],[155,55,45],[105,50,42],[62,80,40],[110,102,40],[165,102,40]]
@@ -100,7 +112,31 @@ const groups=[['services','Services',services]] as const
 function Services(){return <section className="services">{groups.map(([id,heading,items])=><div key={id} id={id} className="service-group"><h2>{heading}</h2><div className="service-list">{items.map(([n,title,desc,meta]:readonly string[],i)=><FadeIn key={n} delay={i*.1}><article><strong>{n}</strong><div>{meta&&<span className="service-meta">{meta}</span>}<h3>{title}</h3><p>{desc}</p></div></article></FadeIn>)}</div></div>)}</section>}
 function ProjectCard({project,index}:{project:typeof projects[number];index:number}) { const ref=useRef<HTMLDivElement>(null); const {scrollYProgress}=useScroll({target:ref,offset:['start end','start start']}); const scale=useTransform(scrollYProgress,[0,1],[1,1-(projects.length-1-index)*.03]); const [n,cat,title,url,label]=project; return <div ref={ref} className="project-wrap" style={{top:`${index*28}px`}}><motion.article className="project-card" style={{scale}}><div className="project-top"><strong>{n}</strong><div><span>{cat}</span><h3>{title}</h3></div><a href={url} target="_blank" rel="noreferrer" className="live-button">{label} <ArrowUpRight size={16}/></a></div><div className="project-preview"><iframe src={url} title={`${title} live preview`} loading="lazy" tabIndex={-1} /></div></motion.article></div> }
 function Projects(){return <section className="projects" id="projects"><h2 className="hero-heading">Project</h2><div className="project-list">{projects.map((p,i)=><ProjectCard key={p[0]} project={p} index={i}/>)}</div></section>}
-function Footer(){return <section className="relative w-full bg-[linear-gradient(90deg,#781db9,#8a2893_25%,#9e336f_50%,#b03b51_75%,#c94733)] flex flex-col z-10">
+// paint the footer with the video's own top-edge colours, read from the frames the browser actually renders,
+// so the shade above the video stays in sync (decoder colour differences and any colour change in the clip included)
+function useEdgeSync(){
+  const sectionRef=useRef<HTMLElement>(null),videoRef=useRef<HTMLVideoElement>(null)
+  useEffect(()=>{
+    const v=videoRef.current,s=sectionRef.current;if(!v||!s)return
+    const N=24,ctx=document.createElement('canvas').getContext('2d',{willReadFrequently:true});if(!ctx)return
+    ctx.canvas.width=N;ctx.canvas.height=1
+    let id=0
+    const paint=()=>{
+      if(!v.videoWidth)return
+      ctx.drawImage(v,0,0,v.videoWidth,4,0,0,N,1)
+      const p=ctx.getImageData(0,0,N,1).data
+      s.style.background=`linear-gradient(90deg,${Array.from({length:N},(_,i)=>`rgb(${p[i*4]},${p[i*4+1]},${p[i*4+2]}) ${((i+.5)/N*100).toFixed(1)}%`).join()})`
+    }
+    // every rendered frame where supported; otherwise ~4×/s via timeupdate
+    const loop=()=>{paint();id=v.requestVideoFrameCallback(loop)}
+    const rvfc='requestVideoFrameCallback' in v,ev=rvfc?'loadeddata':'timeupdate'
+    if(rvfc)id=v.requestVideoFrameCallback(loop)
+    paint();v.addEventListener(ev,paint)
+    return()=>{v.cancelVideoFrameCallback?.(id);v.removeEventListener(ev,paint)}
+  },[])
+  return{sectionRef,videoRef}
+}
+function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={sectionRef} className="relative w-full bg-[linear-gradient(90deg,#8231b3_5.6%,#8b34a1_16.7%,#943890_27.8%,#9d3c7f_38.9%,#a6406e_50%,#af4460_61.1%,#b84752_72.2%,#c34b44_83.3%,#c84e35_94.4%)] flex flex-col z-10">
 <div className="flex flex-col w-full px-4 sm:px-8 pt-6 text-white text-center">
 <nav className="flex justify-between text-base sm:text-2xl font-semibold tracking-tight"><a href="#projects" className="hover:opacity-70">projects</a><a href="#home" className="hover:opacity-70">aaditya jaiswar</a><a href="/contact" className="hover:opacity-70">contact</a></nav>
 <h2 className="mt-10 sm:mt-16 mb-6 sm:mb-10 text-[clamp(3rem,10vw,9rem)] font-black leading-[.95] tracking-[-.05em]">Let&apos;s build<br/>together</h2>
@@ -111,10 +147,7 @@ function Footer(){return <section className="relative w-full bg-[linear-gradient
 </dl>
 <small className="block mt-10 mb-4 text-sm font-semibold uppercase tracking-wider text-white/50">© {new Date().getFullYear()} Aaditya Jaiswar · Mumbai</small>
 </div>
-<div className="relative w-full shrink-0">
-  <div className="absolute top-0 left-0 w-full h-24 bg-[linear-gradient(90deg,#781db9,#8a2893_25%,#9e336f_50%,#b03b51_75%,#c94733)] pointer-events-none" style={{maskImage:'linear-gradient(to bottom,black,transparent)',WebkitMaskImage:'linear-gradient(to bottom,black,transparent)'}} />
-  {/* poster keeps the still visible until the hosted video loads (or if the host is down) */}
-  <video src="https://www.image2url.com/r2/default/videos/1793086828621-5aad308f-f1a7-44f5-87fc-75c66cf335c2.mp4" poster="/footer.png" autoPlay muted loop playsInline aria-hidden="true" className="w-full aspect-[2068/996] object-cover block" />
-</div>
+{/* static gradient = the video's top edge as BT.709; useEdgeSync replaces it live once frames render */}
+<video ref={videoRef} src="/footer.mp4" poster="/footer-poster.jpg" autoPlay muted loop playsInline aria-hidden="true" className="w-full aspect-[2068/996] object-cover block shrink-0" />
 </section>}
 export default function Page(){return <main><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
