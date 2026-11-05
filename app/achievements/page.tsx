@@ -6,7 +6,7 @@ import BackButton from '@/components/BackButton'
 import LetterSwap from '@/components/LetterSwap'
 
 const achievements = [
-  { rank: '1st Place', event: 'Periscope Technologies', media: '/achievement/1st.mp4', note: 'Won a ₹1 Lakh cash prize for ArogyaSense, an AI-integrated mobile health ecosystem.' },
+  { rank: '1st Place', event: 'Periscope Technologies', media: '/achievement/1st.mp4', focusY: 0.78, note: 'Won a ₹1 Lakh cash prize for ArogyaSense, an AI-integrated mobile health ecosystem.' },
   { rank: '2nd Runner-Up', event: 'DEEP BLUE Hackathon', media: '/achievement/2nd.jpg', certificate: '/achievement/2nd%20mastek.pdf', note: 'National-level hackathon (Mastek-Majesco Season 10) for an AI-based food freshness detection system.' },
   { rank: 'Top 5 Finalist', event: 'CODEASTRA 2.0', note: 'Secured a top 5 finalist position at MCA-RGIT’s CODEASTRA 2.0.' },
   { rank: 'Top 10 Finalist', event: 'SAKEC CREATHON 2025', note: 'Secured a top 10 finalist position in SAKEC’s CREATHON 2025 hackathon.' },
@@ -14,7 +14,7 @@ const achievements = [
 ]
 
 // module-level so the slider's WebGL engine isn't rebuilt every render
-const slides = achievements.flatMap(a => a.media ? [{ image: a.media, caption: `${a.rank} — ${a.event}` }] : [])
+const slides = achievements.flatMap(a => a.media ? [{ image: a.media, focusY: a.focusY, caption: `${a.rank} — ${a.event}` }] : [])
 
 export default function Achievements() {
   return (
@@ -30,7 +30,7 @@ export default function Achievements() {
           <div className="relative h-[45vh] lg:h-auto min-h-0">
             <MorphSlider items={slides} transition="melt" intensity={0.55} aberration={0.35} drift={0.4} radius={24} autoplay />
           </div>
-          <ol className="grid gap-3 content-center min-h-0">
+          <ol className="grid auto-rows-max gap-3 content-center min-h-0">
             {achievements.map((a, i) => (
               <li key={a.event} className="liquid-glass rounded-3xl p-4 lg:px-6 lg:py-4 flex items-center gap-4">
                 <strong className="text-2xl lg:text-4xl font-bold text-white/40 tabular-nums shrink-0">{String(i + 1).padStart(2, '0')}</strong>
@@ -38,7 +38,7 @@ export default function Achievements() {
                   <p className="text-[11px] lg:text-xs uppercase tracking-wider text-[#f6e6f8]/70">{a.rank}</p>
                   <h2 className="text-lg lg:text-2xl leading-tight"><LetterSwap text={a.event} /></h2>
                   <p className="mt-0.5 text-xs lg:text-sm text-white/75">{a.note}</p>
-                  {a.certificate && <a href={a.certificate} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-[#f6e6f8] underline underline-offset-4 hover:text-white">view certificate ↗</a>}
+                  {a.certificate && <a href={a.certificate} target="_blank" rel="noreferrer" className="absolute top-3 right-4 lg:right-6 text-xs text-[#f6e6f8] underline underline-offset-4 hover:text-white">view certificate ↗</a>}
                 </div>
               </li>
             ))}

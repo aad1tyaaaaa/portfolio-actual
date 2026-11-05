@@ -30,25 +30,23 @@ export default function Music() {
         <div className="flex-1"><AlbumRail items={albums} /></div>
       </section>
       <section id="playlists" className="relative mx-auto max-w-6xl px-4 pb-24 sm:px-8">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-['Instrument_Serif',serif] text-4xl italic text-[#d7e2ea]">my playlists</h2>
+        <h2 className="mb-8 font-['Instrument_Serif',serif] text-4xl italic text-[#d7e2ea]">my playlists</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {playlists.map(id => (
+            <iframe key={id} src={`https://open.spotify.com/embed/playlist/${id}?theme=0`} title="Spotify playlist" height={352} loading="lazy"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" className="w-full rounded-xl border-0" />
+          ))}
+        </div>
+        <div className="fixed top-5 right-5 sm:top-6 sm:right-8 z-50">
           <a href={profile} target="_blank" rel="noreferrer"
             className="group inline-flex items-center gap-3 rounded-full border border-[#1DB954]/40 bg-[#1DB954]/10 py-2 pr-6 pl-2 text-[#d7e2ea] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1DB954] hover:bg-[#1DB954]/20 hover:shadow-[0_8px_30px_#1DB95440]">
-            <span className="grid size-10 place-items-center rounded-full bg-[#1DB954] text-[#0c0c0c] transition-transform duration-500 group-hover:rotate-[360deg]">
-              <svg viewBox="0 0 24 24" className="size-6" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-            </span>
+            <svg viewBox="0 0 24 24" className="size-10 shrink-0 text-[#1DB954] transition-transform duration-500 group-hover:rotate-[360deg]" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
             <span className="flex flex-col leading-tight">
               <span className="text-[11px] tracking-wide opacity-60">@aad1tyaaaaa.</span>
               <span className="text-sm font-semibold whitespace-nowrap">Follow on Spotify</span>
             </span>
             <ArrowUpRight size={16} className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
           </a>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {playlists.map(id => (
-            <iframe key={id} src={`https://open.spotify.com/embed/playlist/${id}?theme=0`} title="Spotify playlist" height={352} loading="lazy"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" className="w-full rounded-xl border-0" />
-          ))}
         </div>
       </section>
     </main>

@@ -12,6 +12,9 @@ import HamsterWheel from '@/components/HamsterWheel'
 import ShadowWalker from '@/components/ShadowWalker'
 import Astronaut from '@/components/Astronaut'
 import PixelTorch from '@/components/PixelTorch'
+import Bb8Toggle from '@/components/Bb8Toggle'
+import EarthLoader from '@/components/EarthLoader'
+import PyramidLoader from '@/components/PyramidLoader'
 
 const showcase = [
   { name: 'Washing Machine', files: ['WashingMachine.jsx', 'WashingMachine.css'], preview: <WashingMachine /> },
@@ -25,6 +28,9 @@ const showcase = [
   { name: 'Shadow Walker', files: ['ShadowWalker.jsx', 'ShadowWalker.css'], preview: <ShadowWalker />, bg: '#e9e4f0' },
   { name: 'Astronaut', files: ['Astronaut.jsx', 'Astronaut.css'], preview: <Astronaut /> },
   { name: 'Pixel Torch', files: ['PixelTorch.jsx', 'PixelTorch.css'], preview: <PixelTorch /> },
+  { name: 'BB-8 Toggle', files: ['Bb8Toggle.jsx', 'Bb8Toggle.css'], preview: <Bb8Toggle /> },
+  { name: 'Earth Loader', files: ['EarthLoader.jsx', 'EarthLoader.css'], preview: <EarthLoader /> },
+  { name: 'Pyramid Loader', files: ['PyramidLoader.jsx', 'PyramidLoader.css'], preview: <PyramidLoader /> },
 ]
 
 const socials = [

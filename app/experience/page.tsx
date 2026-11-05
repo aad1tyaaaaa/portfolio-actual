@@ -1,23 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import BackButton from '@/components/BackButton'
 
-// dark: video background is light, so text flips to navy
 const roles = [
   { company: 'Periscope Technologies', role: 'SDE Intern', logo: '/experience/periscope.png', date: 'Feb 2026 – Present', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_092026_dd05b805-ea0f-40b2-8c52-332b88502592.mp4', text: 'Architected RBAC with 4 admin personas and JWT auth, cutting clinical data retrieval latency by 30%. Built event-driven microservices ingesting real-time IoT wearable data via Kafka, and raised healthcare data throughput by 35% with FastAPI and Celery.', stack: 'FastAPI · Celery · Kafka · JWT · IoT' },
-  { company: 'Bluestock', role: 'Software Development Intern', logo: '/experience/bluestock.jpg', date: 'Oct 2025 – Nov 2025', dark: true, video: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081042_df7202bf-bd80-4b2b-bbc6-1f09ba2870e9.mp4', text: 'Led end-to-end development of an IPO management platform, refactoring queries to speed up review workflows by 40%. Shipped secure REST endpoints with OAuth 2.0 and rate limiting that processed 500+ sensitive financial documents.', stack: 'React.js · Django REST · OAuth 2.0' },
-  { company: 'Ibtidaa Tech', role: 'AI Intern', logo: '/experience/ibtidaa.jpg', date: 'Jul 2025 – Aug 2025', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_080959_4cac5234-3573-464e-a5b7-76b94b8a7d61.mp4', text: 'Fine-tuned LLMs with Hugging Face PEFT/LoRA, improving contextual accuracy by 15%. Built ETL pipelines with Python and Apache Airflow for large-scale unstructured data, cutting evaluation benchmarking time by 25%.', stack: 'PEFT/LoRA · Hugging Face · Airflow' },
+  { company: 'Ibtidaa Tech', role: 'AI Intern', logo: '/experience/ibtidaa.jpg', round: true, date: 'Jul 2025 – Aug 2025', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_080959_4cac5234-3573-464e-a5b7-76b94b8a7d61.mp4', text: 'Fine-tuned LLMs with Hugging Face PEFT/LoRA, improving contextual accuracy by 15%. Built ETL pipelines with Python and Apache Airflow for large-scale unstructured data, cutting evaluation benchmarking time by 25%.', stack: 'PEFT/LoRA · Hugging Face · Airflow', docs: [{ label: 'Certificate', src: '/experience-letter/Aaditya%20Jaiswar.jpg' }, { label: 'Letter', src: '/experience-letter/ibtidaaa.pdf' }] },
   // ponytail: reuses the old Overview video until CybraneX has its own
-  { company: 'CybraneX', role: 'Quantum ML Intern', logo: '/experience/cybranex_logo.jpg', date: 'Oct 2025 – Oct 2026', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081127_0992a171-d3c6-4978-8213-0ec5df8b6d63.mp4', text: 'Built a hybrid quantum-classical pipeline around a 6-qubit quantum autoencoder detecting lithium and vanadium in 198-band NASA Hyperion imagery, best of 7 benchmarked methods at 0.770 AUC. Shipped a live Sentinel-2 engine turning any lat/long into mineral prospectivity maps, with a Next.js dashboard.', stack: 'PennyLane · Python · Sentinel-2 · Next.js' },
+  { company: 'CybraneX', role: 'Quantum ML Intern', logo: '/experience/cybranex_logo.jpg', date: 'Oct 2025 – Oct 2026', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081127_0992a171-d3c6-4978-8213-0ec5df8b6d63.mp4', text: 'Built a hybrid quantum-classical pipeline around a 6-qubit quantum autoencoder detecting lithium and vanadium in 198-band NASA Hyperion imagery, best of 7 benchmarked methods at 0.770 AUC. Shipped a live Sentinel-2 engine turning any lat/long into mineral prospectivity maps, with a Next.js dashboard.', stack: 'PennyLane · Python · Sentinel-2 · Next.js', docs: [{ label: 'Letter', src: '/experience-letter/cybraneX_Letter.pdf' }] },
 ]
-const stats = ['4 Internships', '40% Faster Workflows', '35% Higher Throughput', '500+ Documents Secured']
+const stats = ['3 Internships', '40% Faster Workflows', '35% Higher Throughput', '500+ Documents Secured']
 
 export default function Experience() {
   const [active, setActive] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [doc, setDoc] = useState<{ label: string; src: string } | null>(null)
+  const dialog = useRef<HTMLDialogElement>(null)
+  const openDoc = (d: { label: string; src: string }) => { setDoc(d); dialog.current?.showModal() }
   const r = roles[active]
-  const tone = `transition-colors duration-700 ${r.dark ? 'text-[#182C41]' : 'text-white'}`
+  const tone = 'text-white'
 
   const switchRole = (i: number) => {
     if (i === active || isTransitioning) return
@@ -50,14 +51,23 @@ export default function Experience() {
         </div>
 
         <div key={active} className="exp-fade flex flex-col items-center text-center mt-8 sm:mt-12 gap-4 sm:gap-5 max-w-3xl mx-auto w-full">
-          <img src={r.logo} alt={`${r.company} logo`} className="h-14 sm:h-16 w-auto max-w-[220px] object-contain rounded-2xl bg-white shadow-lg" />
+          <img src={r.logo} alt={`${r.company} logo`} className={`h-14 sm:h-16 w-auto max-w-[220px] object-contain bg-white shadow-lg ${r.round ? 'rounded-full' : 'rounded-2xl'}`} />
           <div className={`liquid-glass rounded-full px-4 py-1.5 text-xs sm:text-sm ${tone}`}>{r.date}</div>
           <div>
             <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] ${tone}`}>{r.company}</h1>
             <p className={`mt-2 text-base sm:text-xl md:text-2xl opacity-80 ${tone}`}>{r.role}</p>
           </div>
           <p className={`max-w-2xl leading-relaxed text-sm sm:text-base ${tone}`}>{r.text}</p>
-          <div className={`liquid-glass rounded-full px-5 py-2 text-xs sm:text-sm ${tone}`}>{r.stack}</div>
+          {/* docs share the stack's row so they stay inside the window frame */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className={`liquid-glass rounded-full px-5 py-2 text-xs sm:text-sm ${tone}`}>{r.stack}</div>
+            {r.docs?.map(d => (
+              <button key={d.src} onClick={() => openDoc(d)}
+                className="rounded-full bg-white px-5 py-2 text-xs font-medium text-[#0c0c0c] shadow-lg transition-transform hover:scale-105 sm:text-sm">
+                View {d.label.toLowerCase()} ↗
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex-1" />
@@ -70,6 +80,25 @@ export default function Experience() {
           ))}
         </div>
       </div>
+
+      {/* native <dialog>: Esc, focus trap and backdrop for free; clicking the backdrop closes it too */}
+      <dialog ref={dialog} onClose={() => setDoc(null)} onClick={e => e.target === e.currentTarget && dialog.current?.close()}
+        className="m-auto h-[85dvh] w-[min(92vw,1000px)] overflow-hidden rounded-2xl bg-[#0c0c0c] p-0 text-white backdrop:bg-black/70 backdrop:backdrop-blur-sm">
+        {doc && (
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 text-sm">
+              <span>{r.company} — {doc.label}</span>
+              <div className="flex items-center gap-4">
+                <a href={doc.src} target="_blank" rel="noreferrer" className="opacity-70 hover:opacity-100">open ↗</a>
+                <button onClick={() => dialog.current?.close()} aria-label="Close" className="text-xl leading-none opacity-70 hover:opacity-100">×</button>
+              </div>
+            </div>
+            {doc.src.endsWith('.pdf')
+              ? <iframe src={`${doc.src}#navpanes=0&view=FitH`} title={doc.label} className="w-full flex-1 bg-white" />
+              : <img src={doc.src} alt={`${r.company} ${doc.label}`} className="min-h-0 w-full flex-1 object-contain p-4" />}
+          </div>
+        )}
+      </dialog>
     </section>
   )
 }

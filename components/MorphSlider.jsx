@@ -43,8 +43,8 @@ precision highp float;
 uniform sampler2D tCurrent;
 uniform sampler2D tNext;
 uniform vec2 uResolution;
-uniform vec2 uCurrentSize;
-uniform vec2 uNextSize;
+uniform vec3 uCurrentSize; // w, h, focusY (0 = top, 1 = bottom)
+uniform vec3 uNextSize;
 uniform float uProgress;
 uniform float uDir;
 uniform int uMode;
@@ -102,7 +102,7 @@ mat2 rot(float a) {
   return mat2(c, -s, s, c);
 }
 
-vec2 coverUV(vec2 uv, vec2 res, vec2 img) {
+vec2 coverUV(vec2 uv, vec2 res, vec3 img) {
   float rA = res.x / max(res.y, 1.0);
   float iA = img.x / max(img.y, 1.0);
   vec2 s = vec2(1.0);
@@ -112,7 +112,7 @@ vec2 coverUV(vec2 uv, vec2 res, vec2 img) {
   } else {
     s.x = ratio;
   }
-  return (uv - 0.5) * s + 0.5;
+  return uv * s + (1.0 - s) * vec2(0.5, 1.0 - img.z);
 }
 
 void main() {
@@ -244,7 +244,7 @@ class MorphEngine {
     this.geometry = new Triangle(this.gl);
 
     this.textures = this.items.map(() => makeFallbackTexture(this.gl));
-    this.sizes = this.items.map(() => [1, 1]);
+    this.sizes = this.items.map(() => [1, 1, 0.5]);
 
     const opts = this.getOptions();
     this.program = new Program(this.gl, {
@@ -294,7 +294,7 @@ class MorphEngine {
           const texture = new Texture(this.gl, { generateMipmaps: false });
           texture.image = video;
           this.textures[index] = texture;
-          this.sizes[index] = [video.videoWidth || 1, video.videoHeight || 1];
+          this.sizes[index] = [video.videoWidth || 1, video.videoHeight || 1, item.focusY ?? 0.5];
           (this.videos ??= []).push(video);
           if (index === this.current) {
             this.program.uniforms.tCurrent.value = texture;
@@ -311,7 +311,7 @@ class MorphEngine {
         const texture = new Texture(this.gl, { generateMipmaps: false });
         texture.image = img;
         this.textures[index] = texture;
-        this.sizes[index] = [img.naturalWidth || 1, img.naturalHeight || 1];
+        this.sizes[index] = [img.naturalWidth || 1, img.naturalHeight || 1, item.focusY ?? 0.5];
         if (index === this.current) {
           this.program.uniforms.tCurrent.value = texture;
           this.program.uniforms.uCurrentSize.value = this.sizes[index];
