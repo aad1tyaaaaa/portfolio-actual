@@ -16,6 +16,7 @@ import HamsterWheel from '@/components/HamsterWheel'
 import ShadowWalker from '@/components/ShadowWalker'
 import Astronaut from '@/components/Astronaut'
 import PixelTorch from '@/components/PixelTorch'
+import HeroCharacter from '@/components/HeroCharacter'
 import { projects } from '@/lib/projects'
 import { characters } from '@/lib/characters'
 import { badges } from '@/lib/badges'
@@ -37,7 +38,7 @@ function FadeIn({ children, delay=0, x=0, y=30, className='' }: { children: Reac
   return <motion.div className={className} initial={{ opacity: 0, x, y }} whileInView={{ opacity: 1, x: 0, y: 0 }} viewport={{ once: true, margin: '50px', amount: 0 }} transition={{ delay, duration: .7, ease: [.25,.1,.25,1] }}>{children}</motion.div>
 }
 function ContactButton() { return <a href="/contact" className="contact-cta">CONTACT ME <span aria-hidden="true">↗</span></a> }
-const navItems=[{label:'Services',href:'#services'},{label:'Experience',href:'/experience'},{label:'Achievements',href:'/achievements'},{label:'Education',href:'/education'},{label:'Projects',href:'/projects'},{label:'Resume',href:'/resume'}]
+const navItems=[{label:'About',href:'#about'},{label:'Experience',href:'/experience'},{label:'Achievements',href:'/achievements'},{label:'Education',href:'/education'},{label:'Projects',href:'/projects'},{label:'Resume',href:'/resume'},{label:'Contact',href:'/contact'}]
 const navDrops=['#b600a8','#7621b0','#f6e6f8']
 const navTheme={'--gn-ink':'#fff','--gn-muted':'#fff'} as React.CSSProperties
 // pages that open with a fullscreen intro video
@@ -62,15 +63,18 @@ const navAfterGoo=(e:React.MouseEvent)=>{
   document.body.append(v)
   setTimeout(()=>v.play().catch(go),wait)
 }
-// outline = stroked circles under the same circles filled, so only the outer edge shows; tail trails down-left to the head
-const cloud=[[200,80,45],[155,55,45],[105,50,42],[62,80,40],[110,102,40],[165,102,40]]
-const tail=[[46,133,11],[28,152,6.5]]
-function ThoughtCloud(){return <svg className="thought-cloud" viewBox="0 0 260 175" aria-hidden="true">
-  <g stroke="#d7e2ea" strokeWidth="5">{[...cloud,...tail].map(([x,y,r],i)=><circle key={i} cx={x} cy={y} r={r}/>)}</g>
-  <g fill="#0c0c0c">{[...cloud,...tail].map(([x,y,r],i)=><circle key={i} cx={x} cy={y} r={r}/>)}</g>
-  <text x="132" y="88" textAnchor="middle" fill="#e28bed" fontFamily="'Instrument Serif',serif" fontStyle="italic" fontSize="34">nah i&apos;d win</text>
-</svg>}
-function Hero() { return <section className="hero" id="home"><div className="hero-nav" onClickCapture={navAfterGoo}><GooeyNav items={navItems} color="#b600a8" activeTextColor="#fff" colors={navDrops} frame={false} style={navTheme} /></div><motion.img className="hero-image" src="/home.png" alt="Aaditya Jaiswar, software engineer" initial={{opacity:0}} animate={{opacity:1}} transition={{duration:.8}} /><motion.div className="hero-figure" initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:1,delay:.3}}><img src="/home2.png" alt="" /><ThoughtCloud /></motion.div><div className="hero-title"><FadeIn delay={.15} y={40}><h1><span>hi, i&apos;m</span>aaditya</h1></FadeIn></div>{/* outline copy above the figure, so letters it covers still read */}<div className="hero-title hero-title-outline" aria-hidden="true"><FadeIn delay={.15} y={40}><div className="hero-wm"><span>hi, i&apos;m</span>aaditya</div></FadeIn></div><HeroSocials/><div className="hero-bottom"><FadeIn delay={.35} className="hero-tagline"><p>A software engineer driven by building intelligent, scalable, and unforgettable digital products.</p></FadeIn><FadeIn delay={.5}><ContactButton /></FadeIn></div></section> }
+function Hero(){return <section className="hero" id="home">
+  <HeroCharacter/>
+  <div className="hero-nav" onClickCapture={navAfterGoo}><GooeyNav items={navItems} color="#b600a8" activeTextColor="#fff" colors={navDrops} frame={false} style={navTheme} /></div>
+  <div className="hero-copy">
+    <FadeIn delay={.15} y={30}><h1>Aaditya<br/>Jaiswar</h1></FadeIn>
+    <FadeIn delay={.3} y={20}><p className="hero-role">Software Engineer <i>|</i> AI &amp; Full-Stack Developer</p></FadeIn>
+    <FadeIn delay={.45} y={20}><p className="hero-intro">Building intelligent systems and unforgettable digital experiences.</p></FadeIn>
+    <FadeIn delay={.6} y={20}><ContactButton/></FadeIn>
+  </div>
+  <HeroSocials/>
+  <a href="#about" className="hero-scroll" aria-label="Scroll to about"><span/>scroll</a>
+</section>}
 function Marquee() { const [offset,setOffset]=useState(0); const ref=useRef<HTMLElement>(null); useEffect(()=>{const fn=()=>{if(ref.current)setOffset((window.scrollY-ref.current.offsetTop+window.innerHeight)*.3)}; window.addEventListener('scroll',fn,{passive:true}); return()=>window.removeEventListener('scroll',fn)},[]); return <section ref={ref} className="marquee"><div className="marquee-row" style={{transform:`translateX(${offset-200}px)`}}>{[...gifs.slice(0,11),...gifs.slice(0,11),...gifs.slice(0,11)].map((src,i)=><img key={i} src={src} alt="Selected project" loading="lazy" />)}</div><div className="marquee-row" style={{transform:`translateX(-${offset-200}px)`}}>{[...gifs.slice(11),...gifs.slice(11),...gifs.slice(11)].map((src,i)=><img key={i} src={src} alt="Selected project" loading="lazy" />)}</div></section> }
 const roles=['Software Development Engineer','Full-Stack Developer','AI & LLM Engineer','Backend & API Developer','Cloud & DevOps Engineer','Mobile App Developer','IoT Developer']
 const socials:[string,string,React.ReactNode][]=[
