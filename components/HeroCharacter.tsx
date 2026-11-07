@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { Renderer, Program, Mesh, Triangle, Texture, RenderTarget } from 'ogl'
 
 /*
-  Skull video → face reveal, landonorris.com style: the cursor leaves a decaying "liquid" trail in a low-res
-  ping-pong buffer; the composite shader thresholds trail+noise into a hard-edged blob and shows the face
-  inside it, the skull outside, with a neon rim on the boundary. Tap / keyboard focus sweeps the face in fully.
+  Face → skull video reveal, landonorris.com style: the cursor leaves a decaying "liquid" trail in a low-res
+  ping-pong buffer; the composite shader thresholds trail+noise into a hard-edged blob and shows the skull
+  inside it, the face outside, with a neon rim on the boundary. Tap / keyboard focus sweeps the skull in fully.
   face-cutout.webp is pre-cropped onto the skull's 16:9 frame (face 1.232x of source, bottom-anchored; eyes on the skull sockets, shoulders on its jacket) so both share one UV space.
   No WebGL → the <video>/<img> layers stay visible and the CSS crossfade in globals.css takes over.
 */
@@ -27,7 +27,7 @@ void main(){
 }`
 
 const COMPOSITE = /* glsl */ `precision highp float;
-uniform sampler2D tSkull, tFace, tMask, tSkullDepth, tFaceDepth; uniform float uTime, uFull, uAspect; uniform vec2 uLook; varying vec2 vUv;
+uniform sampler2D tSkull, tFace, tMask, tSkullDepth, tFaceDepth; uniform float uTime, uFull, uAspect; uniform vec2 uLook; uniform vec4 uBox; varying vec2 vUv;
 // depth parallax = fake head turn: near pixels (nose, chest) slide toward the look direction more than far ones.
 // fixed-point iteration samples depth at the displaced spot, so edges don't tear. head (upper half) turns more than the chest.
 vec2 turn(sampler2D dm, vec2 uv){
@@ -41,12 +41,15 @@ float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); 
 float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + 1.), f.x), f.y); }
 void main(){
+  // the canvas covers the whole hero (so the trail paints edge to edge); the character lives in uBox (offset.xy, size.zw)
+  vec2 c = (vUv - uBox.xy) / uBox.zw;
+  float inb = step(0., c.x) * step(c.x, 1.) * step(0., c.y) * step(c.y, 1.);
   // skull: black backdrop becomes transparent (premultiplied, alpha = brightest channel, approx. screen blend), soft frame edges
-  vec4 s = texture2D(tSkull, turn(tSkullDepth, vUv));
+  vec4 s = texture2D(tSkull, turn(tSkullDepth, c)) * inb;
   s.rgb = max(s.rgb - .035, 0.) / .965; // crush the video's near-black purple so empty areas are truly transparent
-  s.rgb *= smoothstep(0., .09, vUv.x) * smoothstep(1., .91, vUv.x) * pow(smoothstep(1., .7, vUv.y), 1.6); // long soft top fade: the source flames hit the frame edge
+  s.rgb *= smoothstep(0., .09, c.x) * smoothstep(1., .91, c.x) * pow(smoothstep(1., .7, c.y), 1.6); // long soft top fade: the source flames hit the frame edge
   float sa = max(s.r, max(s.g, s.b));
-  vec4 f = texture2D(tFace, turn(tFaceDepth, vUv));
+  vec4 f = texture2D(tFace, turn(tFaceDepth, c)) * inb;
 
   vec2 p = vUv * vec2(uAspect, 1.);
   float n = noise(p * 4. + uTime * .25) * .65 + noise(p * 11. - uTime * .35) * .35;
@@ -62,7 +65,7 @@ void main(){
   m = max(m, full);
   rim = max(rim * (1. - full), smoothstep(-.07, 0., d) * (1. - full) * sin(uFull * 3.14159));
 
-  vec4 col = mix(vec4(s.rgb, sa), vec4(f.rgb * f.a, f.a), m);
+  vec4 col = mix(vec4(f.rgb * f.a, f.a), vec4(s.rgb, sa), m);
   vec3 glow = mix(vec3(.71, 0., .66), vec3(0., .9, 1.), n);
   float g = rim * rim * (.55 + .45 * max(sa, f.a));
   col.rgb += glow * g;
@@ -90,7 +93,7 @@ export default function HeroCharacter() {
   }, [])
 
   useEffect(() => {
-    const el = box.current!, cv = canvas.current!, vid = skull.current!, img = face.current!
+    const el = box.current!, cv = canvas.current!, vid = skull.current!, img = face.current!, hero = cv.parentElement!
     let renderer: Renderer
     try { renderer = new Renderer({ canvas: cv, alpha: true, premultipliedAlpha: true, dpr: Math.min(devicePixelRatio, 1.5), depth: false }) }
     catch { return } // no WebGL: CSS fallback
@@ -109,18 +112,20 @@ export default function HeroCharacter() {
     const comp = new Mesh(gl, { geometry: tri, program: new Program(gl, { vertex: VERT, fragment: COMPOSITE, depthTest: false, uniforms: {
       tSkull: { value: skullTex }, tFace: { value: faceTex }, tMask: { value: read.texture },
       tSkullDepth: { value: skullDepth }, tFaceDepth: { value: faceDepth }, uLook: { value: [0, 0] },
-      uTime: { value: 0 }, uFull: { value: 0 }, uAspect: { value: 16 / 9 } } }) })
+      uTime: { value: 0 }, uFull: { value: 0 }, uAspect: { value: 16 / 9 }, uBox: { value: [0, 0, 1, 1] } } }) })
 
     const resize = () => {
-      const { width, height } = el.getBoundingClientRect()
+      const hr = hero.getBoundingClientRect(), b = el.getBoundingClientRect()
+      const { width, height } = hr
       renderer.setSize(width, height)
+      comp.program.uniforms.uBox.value = [(b.left - hr.left) / width, (hr.bottom - b.bottom) / height, b.width / width, b.height / height]
       // trail at ~1/4 res: cheap, and the bilinear upscale softens it before thresholding
       const w = Math.max(2, Math.round(width / 4)), h = Math.max(2, Math.round(height / 4))
       read = new RenderTarget(gl, { width: w, height: h, depth: false })
       write = new RenderTarget(gl, { width: w, height: h, depth: false })
     }
     const ro = new ResizeObserver(resize)
-    ro.observe(el)
+    ro.observe(el); ro.observe(hero)
 
     // pointer in canvas UV (y up); eased so fast moves draw continuous segments
     const target = { x: .5, y: .5, in: false }, eased = { x: .5, y: .5 }, last = { x: .5, y: .5 }
@@ -131,10 +136,10 @@ export default function HeroCharacter() {
       look.mouse = true
       look.tx = e.clientX / innerWidth * 2 - 1
       look.ty = 1 - e.clientY / innerHeight * 2
-      const r = el.getBoundingClientRect()
+      const r = hero.getBoundingClientRect()
       target.x = (e.clientX - r.left) / r.width
       target.y = 1 - (e.clientY - r.top) / r.height
-      // the whole frame paints (it fills the hero): the cursor reveals wherever it goes over the hero
+      // the canvas fills the hero: the cursor paints wherever it goes over it
       const inside = target.x >= 0 && target.x <= 1 && target.y >= 0 && target.y <= 1
       // entering: jump the eased point to the cursor so it doesn't paint a streak from where it last was
       if (inside && !target.in) { eased.x = last.x = target.x; eased.y = last.y = target.y }
@@ -195,6 +200,8 @@ export default function HeroCharacter() {
 
   return <>
     <video ref={bg} className="hero-bg" src="/hero/background-loop.mp4" autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
+    {/* shown while the home music plays (html[data-music], set by HomeAudio) */}
+    <img className="hero-moon" src="/hero/moon.jpg" alt="" aria-hidden="true" decoding="async" />
     <div ref={box} className="char" data-on={on || undefined}>
       <div className="char-glow" aria-hidden="true" />
       <video ref={skull} className="char-skull" autoPlay muted loop playsInline preload="auto" poster="/hero/skull-poster.webp" aria-hidden="true">
@@ -202,17 +209,17 @@ export default function HeroCharacter() {
         <source src="/hero/skull-1080.mp4" type="video/mp4" />
       </video>
       <img ref={face} className="char-face" src="/hero/face-cutout.webp" alt="" fetchPriority="high" />
-      <canvas ref={canvas} className="char-gl" aria-hidden="true" />
       <button
         type="button"
         className="char-hit"
         aria-pressed={on}
-        aria-label="Reveal the face behind the flaming skull"
+        aria-label="Reveal the flaming skull behind the face"
         // mouse users reveal by moving over the character; touch-first devices get a sticky toggle
         onClick={() => matchMedia('(hover: none)').matches && set(!reveal.current)}
         onFocus={e => e.currentTarget.matches(':focus-visible') && set(true)}
         onBlur={() => set(false)}
       />
     </div>
+    <canvas ref={canvas} className="char-gl" aria-hidden="true" />
   </>
 }

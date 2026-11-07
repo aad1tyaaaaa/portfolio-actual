@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 /*
   Full-screen menu. Layout: socials + small links on the left, big page links from the centre;
-  top bar: "— Menu/Close" left, logo centre, CTA right. Motion: the panel drops from the top with a
+  top bar: logo left, CTA pill + hamburger (morphs to X) right. Motion: the panel drops from the top with a
   curved (ellipse clip-path) edge, links rise in staggered, the current page gets a hand-drawn strike;
   closing retracts the panel upward.
 */
@@ -40,17 +40,31 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
     return () => { root.style.overflow = ''; clearTimeout(t); removeEventListener('keydown', esc) }
   }, [open])
 
+  // hide the top bar (and the music control, via html[data-bar-hidden]) while scrolling down, bring it back on scroll up
+  useEffect(() => {
+    const root = document.documentElement
+    let last = scrollY
+    const onScroll = () => {
+      const y = scrollY, d = y - last
+      if (Math.abs(d) < 6) return
+      if (y > 80 && d > 0) root.dataset.barHidden = ''
+      else delete root.dataset.barHidden
+      last = y
+    }
+    addEventListener('scroll', onScroll, { passive: true })
+    return () => { removeEventListener('scroll', onScroll); delete root.dataset.barHidden }
+  }, [])
+
   // same-site links close the menu first; external ones just open
   const go = (e: React.MouseEvent, href: string) => { if (!ext(href).target) { setOpen(false); onNavigate?.(e) } }
 
   return <>
     <header className="topbar" data-open={open || undefined}>
-      <button ref={btn} type="button" className="menu-btn" aria-expanded={open} aria-controls="site-menu" onClick={() => setOpen(o => !o)}>
-        <span className="menu-btn-line" aria-hidden="true" />
-        <span className="menu-btn-label">{open ? 'Close' : 'Menu'}</span>
-      </button>
-      <a href="#home" className="topbar-logo" aria-label="Aaditya Jaiswar, home" onClick={() => setOpen(false)}><i>aaditya</i><b>JAISWAR</b></a>
+      <a href="/" className="topbar-logo" aria-label="Aaditya Jaiswar, home" onClick={() => setOpen(false)}><i>aaditya</i><b>JAISWAR</b></a>
       <a href={cta.href} className="topbar-cta" onClick={e => go(e, cta.href)}>{cta.label} <span aria-hidden="true">↗</span></a>
+      <button ref={btn} type="button" className="menu-btn" aria-expanded={open} aria-controls="site-menu" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(o => !o)}>
+        <span className="burger" aria-hidden="true"><i /><i /><i /></span>
+      </button>
     </header>
 
     <div ref={panel} id="site-menu" className="menu" data-open={open || undefined} aria-hidden={!open}
@@ -71,7 +85,7 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
         <ul>
           {items.map((it, i) => <li key={it.href} style={{ '--i': i } as React.CSSProperties}>
             <a className="menu-link" href={it.href} aria-current={i === current ? 'page' : undefined}
-              onClick={e => { setOpen(false); if (i === current) { e.preventDefault(); return } onNavigate?.(e) }}>
+              onClick={e => { setOpen(false); onNavigate?.(e) }}>
               {it.label}
               {i === current && <svg className="menu-strike" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true">
                 <path pathLength={1} d="M2 12 C 30 2, 45 18, 70 10 S 110 4, 130 12 S 170 16, 198 8" />

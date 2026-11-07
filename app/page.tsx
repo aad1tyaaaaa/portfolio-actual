@@ -17,6 +17,7 @@ import ShadowWalker from '@/components/ShadowWalker'
 import Astronaut from '@/components/Astronaut'
 import PixelTorch from '@/components/PixelTorch'
 import HeroCharacter from '@/components/HeroCharacter'
+import HomeAudio from '@/components/HomeAudio'
 import { projects } from '@/lib/projects'
 import { characters } from '@/lib/characters'
 import { badges } from '@/lib/badges'
@@ -38,9 +39,23 @@ function FadeIn({ children, delay=0, x=0, y=30, className='' }: { children: Reac
   return <motion.div className={className} initial={{ opacity: 0, x, y }} whileInView={{ opacity: 1, x: 0, y: 0 }} viewport={{ once: true, margin: '50px', amount: 0 }} transition={{ delay, duration: .7, ease: [.25,.1,.25,1] }}>{children}</motion.div>
 }
 // every page in the site menu
-const navItems=[['Home','#home'],['About','#about'],['Experience','/experience'],['Achievements','/achievements'],['Projects','/projects'],['Education','/education'],['Resume','/resume'],['Contact','/contact']].map(([label,href])=>({label,href}))
+const navItems=[['Home','/'],['About','#about'],['Experience','/experience'],['Achievements','/achievements'],['Projects','/projects'],['Education','/education'],['Resume','/resume'],['Contact','/contact']].map(([label,href])=>({label,href}))
 // small print under the socials in the menu
 const menuSmall:[string,string][]=[['Business enquiries','/contact'],['Download résumé (PDF)','/resume.pdf'],['aadityaaaaa.jaiswar@gmail.com','mailto:aadityaaaaa.jaiswar@gmail.com'],['+91 77100 24884','tel:+917710024884']]
+// links to this page or a section of it scroll instead of reloading / leaving #hash in the address bar
+const samePage=(a:HTMLAnchorElement)=>a.origin===location.origin&&a.pathname===location.pathname
+const scrollToLink=(a:HTMLAnchorElement)=>{
+  const el=a.hash&&a.hash!=='#home'?document.getElementById(a.hash.slice(1)):null
+  const smooth=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'
+  if(el)el.scrollIntoView({behavior:smooth});else scrollTo({top:0,behavior:smooth})
+  if(location.hash)history.replaceState(null,'',location.pathname+location.search)
+}
+// plain same-page links anywhere else on the page (footer, logo)
+const onPageClick=(e:React.MouseEvent)=>{
+  const a=(e.target as HTMLElement).closest('a')
+  if(!a||e.defaultPrevented||a.target==='_blank'||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||!samePage(a))return
+  e.preventDefault();scrollToLink(a)
+}
 // pages that open with a fullscreen intro video
 const intros:Record<string,string>={'/resume':'/resume-intro.mp4','/achievements':'/achievement.mp4'}
 // let the menu curtain close before leaving; plain/modified clicks and new-tab links pass through
@@ -50,6 +65,8 @@ const navAfterClose=(e:React.MouseEvent)=>{
   e.preventDefault()
   const go=()=>{location.href=a.href}
   const wait=matchMedia('(prefers-reduced-motion: reduce)').matches?0:700
+  // same-page links (Home, #about): scroll once the curtain is up, no reload, no hash in the URL
+  if(samePage(a)){setTimeout(()=>scrollToLink(a),wait);return}
   const intro=intros[a.pathname]
   if(!intro){setTimeout(go,wait);return}
   // menu closes first, then a fullscreen intro video that fades in, fades to black, then navigates.
@@ -155,7 +172,7 @@ function useEdgeSync(){
 }
 function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={sectionRef} className="relative w-full bg-[linear-gradient(90deg,#8231b3_5.6%,#8b34a1_16.7%,#943890_27.8%,#9d3c7f_38.9%,#a6406e_50%,#af4460_61.1%,#b84752_72.2%,#c34b44_83.3%,#c84e35_94.4%)] flex flex-col z-10">
 <div className="flex flex-col w-full px-4 sm:px-8 pt-6 text-white text-center">
-<nav className="flex justify-between text-base sm:text-2xl font-semibold tracking-tight"><a href="#projects" className="hover:opacity-70">projects</a><a href="#home" className="hover:opacity-70">aaditya jaiswar</a><a href="/contact" className="hover:opacity-70">contact</a></nav>
+<nav className="flex justify-between text-base sm:text-2xl font-semibold tracking-tight"><a href="#projects" className="hover:opacity-70">projects</a><a href="/" className="hover:opacity-70">aaditya jaiswar</a><a href="/contact" className="hover:opacity-70">contact</a></nav>
 <h2 className="mt-10 sm:mt-16 mb-6 sm:mb-10 text-[clamp(3rem,10vw,9rem)] font-black leading-[.95] tracking-[-.05em]">Let&apos;s build<br/>together</h2>
 <dl className="grid gap-2">
 <dt className="mt-6 text-sm font-semibold uppercase tracking-wider text-white/60">Email</dt><dd className="text-lg sm:text-2xl font-light"><a href="mailto:aadityaaaaa.jaiswar@gmail.com" className="hover:opacity-70">aadityaaaaa.jaiswar@gmail.com</a></dd>
@@ -167,4 +184,7 @@ function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={
 {/* static gradient = the video's top edge as BT.709; useEdgeSync replaces it live once frames render */}
 <video ref={videoRef} src="/footer.mp4" poster="/footer-poster.jpg" autoPlay muted loop playsInline aria-hidden="true" className="w-full aspect-[2068/996] object-cover block shrink-0" />
 </section>}
-export default function Page(){return <main><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email').map(([n,h])=>[n,h])} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
+export default function Page(){
+// old /#home bookmarks: drop the hash (the hero is the top of the page anyway)
+useEffect(()=>{if(location.hash==='#home')history.replaceState(null,'',location.pathname+location.search)},[])
+return <main onClick={onPageClick}><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email').map(([n,h])=>[n,h])} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
