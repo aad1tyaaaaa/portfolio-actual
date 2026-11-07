@@ -1,7 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import Mascot from '@/components/Mascot'
 
 export const metadata: Metadata = {
   title: 'Aaditya Jaiswar -- Software Engineer',
@@ -30,7 +29,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         {children}
-        <Mascot />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

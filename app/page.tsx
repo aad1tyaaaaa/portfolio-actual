@@ -18,6 +18,8 @@ import Astronaut from '@/components/Astronaut'
 import PixelTorch from '@/components/PixelTorch'
 import HeroCharacter from '@/components/HeroCharacter'
 import HomeAudio from '@/components/HomeAudio'
+import Preloader from '@/components/Preloader'
+import Mascot from '@/components/Mascot'
 import { projects } from '@/lib/projects'
 import { characters } from '@/lib/characters'
 import { badges } from '@/lib/badges'
@@ -182,9 +184,9 @@ function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={
 <small className="block mt-10 mb-4 text-sm font-semibold uppercase tracking-wider text-white/50">© {new Date().getFullYear()} Aaditya Jaiswar · Mumbai</small>
 </div>
 {/* static gradient = the video's top edge as BT.709; useEdgeSync replaces it live once frames render */}
-<video ref={videoRef} src="/footer.mp4" poster="/footer-poster.jpg" autoPlay muted loop playsInline aria-hidden="true" className="w-full aspect-[2068/996] object-cover block shrink-0" />
+<video ref={videoRef} src="/footer.mp4" poster="/footer-poster.jpg" autoPlay muted loop playsInline aria-hidden="true" className="w-full aspect-[2056/996] object-cover block shrink-0" />
 </section>}
 export default function Page(){
 // old /#home bookmarks: drop the hash (the hero is the top of the page anyway)
 useEffect(()=>{if(location.hash==='#home')history.replaceState(null,'',location.pathname+location.search)},[])
-return <main onClick={onPageClick}><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email').map(([n,h])=>[n,h])} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
+return <main onClick={onPageClick}><Preloader/><Mascot/><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email').map(([n,h])=>[n,h])} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}

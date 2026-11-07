@@ -6,7 +6,7 @@ import { Renderer, Program, Mesh, Triangle, Texture, RenderTarget } from 'ogl'
 /*
   Face → skull video reveal, landonorris.com style: the cursor leaves a decaying "liquid" trail in a low-res
   ping-pong buffer; the composite shader thresholds trail+noise into a hard-edged blob and shows the skull
-  inside it, the face outside, with a neon rim on the boundary. Tap / keyboard focus sweeps the skull in fully.
+  inside it, the face outside, with a neon rim on the boundary. Tap / the Tab key sweeps the skull in fully (and locks it) until toggled back.
   face-cutout.webp is pre-cropped onto the skull's 16:9 frame (face 1.232x of source, bottom-anchored; eyes on the skull sockets, shoulders on its jacket) so both share one UV space.
   No WebGL → the <video>/<img> layers stay visible and the CSS crossfade in globals.css takes over.
 */
@@ -198,6 +198,21 @@ export default function HeroCharacter() {
 
   const set = (v: boolean) => { reveal.current = v; setOn(v) }
 
+  // Tab toggles face <-> skull (and the choice stays locked) while the hero fills the middle of the screen;
+  // past the hero, or with the menu / a dialog open, Tab moves focus as usual
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return
+      const hero = box.current?.closest('.hero')
+      if (!hero || hero.getBoundingClientRect().bottom < innerHeight / 2) return
+      if (document.querySelector('.menu[data-open], dialog[open]')) return
+      e.preventDefault()
+      reveal.current = !reveal.current; setOn(reveal.current)
+    }
+    addEventListener('keydown', onKey)
+    return () => removeEventListener('keydown', onKey)
+  }, [])
+
   return <>
     <video ref={bg} className="hero-bg" src="/hero/background-loop.mp4" autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
     {/* shown while the home music plays (html[data-music], set by HomeAudio) */}
@@ -214,10 +229,8 @@ export default function HeroCharacter() {
         className="char-hit"
         aria-pressed={on}
         aria-label="Reveal the flaming skull behind the face"
-        // mouse users reveal by moving over the character; touch-first devices get a sticky toggle
-        onClick={() => matchMedia('(hover: none)').matches && set(!reveal.current)}
-        onFocus={e => e.currentTarget.matches(':focus-visible') && set(true)}
-        onBlur={() => set(false)}
+        // mouse users reveal by moving over the character; touch-first devices and keyboard (Tab, Enter/Space) get a sticky toggle
+        onClick={e => (e.detail === 0 || matchMedia('(hover: none)').matches) && set(!reveal.current)}
       />
     </div>
     <canvas ref={canvas} className="char-gl" aria-hidden="true" />
