@@ -28,7 +28,7 @@ export default function Experience() {
   }
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black">
+    <section className="relative w-full h-screen max-md:h-auto max-md:min-h-dvh overflow-hidden bg-black">
       <BackButton />
       {roles.map((v, i) => (
         <video key={v.video} src={v.video} autoPlay muted loop playsInline
@@ -38,7 +38,7 @@ export default function Experience() {
       <img src="https://soft-zoom-63098134.figma.site/_assets/v11/0b4a435b2df2747593c43d7a1c9b4578f7d8d90c.png" alt=""
         className="train-bob absolute inset-0 w-full h-full object-cover pointer-events-none z-[1]" />
 
-      <div className="relative z-[2] flex flex-col h-full px-5 sm:px-8 md:px-12 py-5 sm:py-6">
+      <div className="relative z-[2] flex flex-col h-full max-md:min-h-dvh px-5 sm:px-8 md:px-12 py-5 sm:py-6">
         {/* tabs sit above the content so they never shift when descriptions change length */}
         <div role="tablist" aria-label="Companies" className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-14 sm:mt-10">
           {roles.map((v, i) => (

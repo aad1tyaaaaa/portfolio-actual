@@ -175,3 +175,12 @@ html{scrollbar-gutter:stable}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(#9d3cd1,#d21cc4 55%,#f0a8f8)}
 ::-webkit-scrollbar-corner{background:#0c0c0c}
 @supports not selector(::-webkit-scrollbar){html{scrollbar-color:#b600a8 #0c0c0c;scrollbar-width:thin}}
+
+/* phones only: about copy wraps at word boundaries (per-letter inline-blocks split words mid-letter on narrow lines);
+   explore rows shrink so each label fits the screen width */
+@media(max-width:767px){
+  .letter{display:inline;white-space:pre-wrap}
+  .explore-menu{height:min(60svh,520px)}
+  .explore .flowing-menu__label{font-size:clamp(16px,min(40cqh,6.4cqw),140px)}
+  .explore .flowing-menu__meta{display:none}
+}
