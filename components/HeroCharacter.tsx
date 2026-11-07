@@ -7,7 +7,7 @@ import { Renderer, Program, Mesh, Triangle, Texture, RenderTarget } from 'ogl'
   Skull video → face reveal, landonorris.com style: the cursor leaves a decaying "liquid" trail in a low-res
   ping-pong buffer; the composite shader thresholds trail+noise into a hard-edged blob and shows the face
   inside it, the skull outside, with a neon rim on the boundary. Tap / keyboard focus sweeps the face in fully.
-  face-cutout.webp is pre-cropped onto the skull's 16:9 frame (face 1.1x, ~4.7% down) so both share one UV space.
+  face-cutout.webp is pre-cropped onto the skull's 16:9 frame (face 1.232x of source, bottom-anchored; eyes on the skull sockets, shoulders on its jacket) so both share one UV space.
   No WebGL → the <video>/<img> layers stay visible and the CSS crossfade in globals.css takes over.
 */
 
@@ -27,17 +27,26 @@ void main(){
 }`
 
 const COMPOSITE = /* glsl */ `precision highp float;
-uniform sampler2D tSkull, tFace, tMask; uniform float uTime, uFull, uAspect; varying vec2 vUv;
+uniform sampler2D tSkull, tFace, tMask, tSkullDepth, tFaceDepth; uniform float uTime, uFull, uAspect; uniform vec2 uLook; varying vec2 vUv;
+// depth parallax = fake head turn: near pixels (nose, chest) slide toward the look direction more than far ones.
+// fixed-point iteration samples depth at the displaced spot, so edges don't tear. head (upper half) turns more than the chest.
+vec2 turn(sampler2D dm, vec2 uv){
+  vec2 o = uLook * vec2(.028, .018) * mix(.45, 1., smoothstep(.3, .48, uv.y));
+  vec2 d = o * texture2D(dm, uv).r;
+  d = o * texture2D(dm, uv - d).r;
+  d = o * texture2D(dm, uv - d).r;
+  return uv - d;
+}
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + 1.), f.x), f.y); }
 void main(){
   // skull: black backdrop becomes transparent (premultiplied, alpha = brightest channel, approx. screen blend), soft frame edges
-  vec4 s = texture2D(tSkull, vUv);
+  vec4 s = texture2D(tSkull, turn(tSkullDepth, vUv));
   s.rgb = max(s.rgb - .035, 0.) / .965; // crush the video's near-black purple so empty areas are truly transparent
-  s.rgb *= smoothstep(0., .09, vUv.x) * smoothstep(1., .91, vUv.x) * smoothstep(1., .84, vUv.y);
+  s.rgb *= smoothstep(0., .09, vUv.x) * smoothstep(1., .91, vUv.x) * pow(smoothstep(1., .7, vUv.y), 1.6); // long soft top fade: the source flames hit the frame edge
   float sa = max(s.r, max(s.g, s.b));
-  vec4 f = texture2D(tFace, vUv);
+  vec4 f = texture2D(tFace, turn(tFaceDepth, vUv));
 
   vec2 p = vUv * vec2(uAspect, 1.);
   float n = noise(p * 4. + uTime * .25) * .65 + noise(p * 11. - uTime * .35) * .35;
@@ -89,6 +98,8 @@ export default function HeroCharacter() {
     const tri = new Triangle(gl)
     const tex = (image?: HTMLImageElement | HTMLVideoElement) => new Texture(gl, { image, generateMipmaps: false, minFilter: gl.LINEAR })
     const skullTex = tex(), faceTex = tex()
+    const depth = (src: string) => { const t = tex(); const i = new Image(); i.onload = () => { t.image = i }; i.src = src; return t }
+    const skullDepth = depth('/hero/skull-depth.webp'), faceDepth = depth('/hero/face-depth.webp')
     const rt = () => new RenderTarget(gl, { width: 2, height: 2, depth: false })
     let read = rt(), write = rt()
 
@@ -97,6 +108,7 @@ export default function HeroCharacter() {
       uAspect: { value: 16 / 9 }, uDecay: { value: .012 }, uTime: { value: 0 } } }) })
     const comp = new Mesh(gl, { geometry: tri, program: new Program(gl, { vertex: VERT, fragment: COMPOSITE, depthTest: false, uniforms: {
       tSkull: { value: skullTex }, tFace: { value: faceTex }, tMask: { value: read.texture },
+      tSkullDepth: { value: skullDepth }, tFaceDepth: { value: faceDepth }, uLook: { value: [0, 0] },
       uTime: { value: 0 }, uFull: { value: 0 }, uAspect: { value: 16 / 9 } } }) })
 
     const resize = () => {
@@ -112,13 +124,21 @@ export default function HeroCharacter() {
 
     // pointer in canvas UV (y up); eased so fast moves draw continuous segments
     const target = { x: .5, y: .5, in: false }, eased = { x: .5, y: .5 }, last = { x: .5, y: .5 }
+    // head-turn direction from the cursor anywhere on the page (-1..1), like landonorris.com
+    const look = { x: 0, y: 0, tx: 0, ty: 0, mouse: false }
     const move = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return
+      look.mouse = true
+      look.tx = e.clientX / innerWidth * 2 - 1
+      look.ty = 1 - e.clientY / innerHeight * 2
       const r = el.getBoundingClientRect()
       target.x = (e.clientX - r.left) / r.width
       target.y = 1 - (e.clientY - r.top) / r.height
-      // only the character's silhouette area paints, not the empty corners of the 16:9 frame
-      target.in = target.x > .2 && target.x < .8 && target.y < .85 && target.y > 0
+      // the whole frame paints (it fills the hero): the cursor reveals wherever it goes over the hero
+      const inside = target.x >= 0 && target.x <= 1 && target.y >= 0 && target.y <= 1
+      // entering: jump the eased point to the cursor so it doesn't paint a streak from where it last was
+      if (inside && !target.in) { eased.x = last.x = target.x; eased.y = last.y = target.y }
+      target.in = inside
     }
     const leave = () => { target.in = false }
     addEventListener('pointermove', move, { passive: true })
@@ -139,6 +159,11 @@ export default function HeroCharacter() {
       const k = 1 - Math.exp(-dt * 18)
       eased.x += (target.x - eased.x) * k; eased.y += (target.y - eased.y) * k
       const speed = Math.hypot(eased.x - last.x, eased.y - last.y) / Math.max(dt, 1e-3)
+      // no mouse (touch): slow idle sway so the head still feels alive; reduced motion: hold still
+      const lx = rm.matches ? 0 : look.mouse ? look.tx : Math.sin(time * .6) * .45
+      const ly = rm.matches ? 0 : look.mouse ? look.ty : Math.sin(time * .43) * .2
+      const lk = 1 - Math.exp(-dt * 3.5) // heavy, lagging follow
+      look.x += (lx - look.x) * lk; look.y += (ly - look.y) * lk
       full += ((reveal.current ? 1 : 0) - full) * (rm.matches ? 1 : 1 - Math.exp(-dt * 2.2))
 
       const tu = trail.program.uniforms, cu = comp.program.uniforms
@@ -149,7 +174,7 @@ export default function HeroCharacter() {
       renderer.render({ scene: trail, target: write });
       [read, write] = [write, read]
 
-      cu.tMask.value = read.texture; cu.uTime.value = time; cu.uFull.value = full; cu.uAspect.value = aspect
+      cu.tMask.value = read.texture; cu.uTime.value = time; cu.uFull.value = full; cu.uAspect.value = aspect; cu.uLook.value = [look.x, look.y]
       renderer.render({ scene: comp })
     }
     // stop rendering while the hero is scrolled away

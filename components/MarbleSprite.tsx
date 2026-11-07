@@ -47,6 +47,8 @@ const DEFAULT_ADVANCED = {
 type Advanced = typeof DEFAULT_ADVANCED
 
 export interface MarbleSpriteProps {
+    /** "marble": glass capsule; "ghost": solid dark orb in an animated smoke cloud */
+    variant?: "marble" | "ghost"
     face?: "eyes" | "none"
     /** Shown through the clear half; "transparent" lets the page show instead */
     background?: string
@@ -100,6 +102,7 @@ uniform float uGrain;
 uniform vec2  uLight;
 uniform float uDpr;
 uniform float uTime;
+uniform float uGhost;
 
 const float IOR = 1.5;
 
@@ -220,9 +223,9 @@ vec3 shadeBall(vec3 P, vec3 rd, float px) {
     vec3 c = albedo * (0.80 + 0.30 * d);
     float rimLift = pow(1.0 - clamp(n.z, 0.0, 1.0), 1.6) *
                     smoothstep(-0.5, 0.7, dot(n.xy, vec2(0.55, 0.83)));
-    c += vec3(0.30, 0.31, 0.29) * rimLift * (1.0 - eye);
+    c += vec3(0.30, 0.31, 0.29) * rimLift * (1.0 - eye) * (1.0 - uGhost); // ghost: keep the body dark
     float wash = pow(max(dot(n, normalize(vec3(0.62, 0.62, 0.35))), 0.0), 1.5);
-    c += vec3(0.45, 0.46, 0.42) * wash * (1.0 - eye);
+    c += vec3(0.45, 0.46, 0.42) * wash * (1.0 - eye) * (1.0 - uGhost * 0.9);
     c += vec3(0.30) * pow(max(dot(n, normalize(vec3(0.58, 0.50, 0.64))), 0.0), 2.2) * eye;
     vec3 R = reflect(rd, n);
     float F = 0.04 + 0.96 * pow(1.0 - max(dot(-rd, n), 0.0), 5.0);
@@ -268,6 +271,53 @@ vec4 seamBand(vec2 p, float px) {
     return vec4(body, clamp(lines, 0.0, 1.0), zp, clamp(dark, 0.0, 1.0));
 }
 
+float vnoise(vec2 p) {
+    vec2 i = floor(p), f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = hash13(vec3(i, 7.0)), b = hash13(vec3(i + vec2(1.0, 0.0), 7.0));
+    float c = hash13(vec3(i + vec2(0.0, 1.0), 7.0)), d = hash13(vec3(i + 1.0, 7.0));
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float fbm(vec2 p) {
+    float s = 0.0, a = 0.5;
+    for (int i = 0; i < 5; i++) { s += a * vnoise(p); p = p * 2.03 + vec2(1.7, 9.2); a *= 0.5; }
+    return s;
+}
+
+// ghost variant: opaque dark orb (reuses shadeBall: eyes, gloss) inside a domain-warped fbm smoke cloud.
+// returns premultiplied linear colour
+vec4 ghost(vec2 p, float px) {
+    float t = uTime;
+    float R = uBallR;
+    vec2 q = p - uBallC.xy;
+    float r = length(q);
+
+    // smoke: warped noise drifting upward; the noisy edge breaks off into stray puffs
+    vec2 w = vec2(fbm(q * 2.0 + vec2(0.0, -t * 0.12)), fbm(q * 2.0 + vec2(5.2, t * 0.10)));
+    float n = fbm(q * 1.7 + w * 1.7 + vec2(t * 0.05, -t * 0.09));
+    float edge = R * 1.65 + (n - 0.5) * 0.65; // max ~1.07 capsule radii: stays inside the canvas
+    float dens = smoothstep(edge, edge - 0.22, r) * (0.55 + 0.6 * n);
+    vec3 smoke = mix(vec3(0.10, 0.025, 0.16), vec3(0.42, 0.20, 0.62), smoothstep(0.35, 0.85, n));
+    smoke += vec3(0.45, 0.02, 0.40) * pow(n, 5.0);   // magenta glints, the site's accent
+    float a = clamp(dens, 0.0, 1.0) * 0.92;
+    vec3 col = smoke * a;
+
+    float cov = smoothstep(R + px, R - px, r);
+    if (cov > 0.0) {
+        float rr = min(r, R * 0.9999);
+        vec3 P = uBallC + vec3(q, sqrt(R * R - rr * rr));
+        vec3 c = shadeBall(P, vec3(0.0, 0.0, -1.0), px);
+        vec3 N = normalize(P - uBallC);
+        float rim = pow(1.0 - clamp(N.z, 0.0, 1.0), 2.6);
+        c += mix(vec3(0.75, 0.04, 0.70), vec3(0.04, 0.70, 0.90), smoothstep(-0.6, 0.6, N.x)) * rim * 0.9;
+        c += smoke * 0.35 * rim;                        // smoke light wrapping the edge
+        col = mix(col, c, cov);
+        a = mix(a, 1.0, cov);
+    }
+    return vec4(col, a);
+}
+
 float tone(float x) {
     return x < 0.8 ? x : 0.8 + 0.2 * (1.0 - exp(-(x - 0.8) / 0.2));
 }
@@ -275,6 +325,15 @@ float tone(float x) {
 void main() {
     float px = 1.0 / uRadius;
     vec2 p = (gl_FragCoord.xy - uCenter) * px;
+    if (uGhost > 0.5) {
+        vec4 g = ghost(p, px);
+        vec3 c = g.a > 1e-4 ? g.rgb / g.a : vec3(0.0);
+        c = pow(clamp(vec3(tone(c.r), tone(c.g), tone(c.b)), 0.0, 1.0), vec3(1.0 / 2.2));
+        vec2 gp0 = floor(gl_FragCoord.xy / max(uDpr, 1.0));
+        c = clamp(c + (hash13(vec3(gp0, uTime)) - 0.5) * (4.0 / 255.0) * uGrain, 0.0, 1.0);
+        gl_FragColor = vec4(c * g.a, g.a);
+        return;
+    }
     float r = length(p);
     vec3 rd = vec3(0.0, 0.0, -1.0);
 
@@ -442,6 +501,7 @@ const CAPSULE_PX = 1600
 /* ----------------------------------------------------------- component */
 
 export default function MarbleSprite({
+    variant = "marble",
     face = DEFAULTS.face as "eyes",
     background = DEFAULTS.background,
     scale = DEFAULTS.scale,
@@ -461,7 +521,7 @@ export default function MarbleSprite({
     const [failed, setFailed] = useState(false)
 
     // live prop mirror: the loop reads this, so a prop change never rebuilds GL
-    const props = { face, background, scale, spriteColor, frost, follow, reach, lean, blink, float, adv: { ...DEFAULT_ADVANCED, ...advanced } }
+    const props = { variant, face, background, scale, spriteColor, frost, follow, reach, lean, blink, float, adv: { ...DEFAULT_ADVANCED, ...advanced } }
     const propsRef = useRef(props)
     propsRef.current = props
 
@@ -559,7 +619,7 @@ export default function MarbleSprite({
             for (const n of [
                 "uCenter", "uRadius", "uSeamN", "uSeamD", "uRi", "uLip", "uBallC", "uBallR", "uRot",
                 "uEye", "uFace", "uBall", "uEyeCol", "uBg", "uFrost", "uGloss", "uGlow", "uGrain",
-                "uLight", "uDpr", "uTime",
+                "uLight", "uDpr", "uTime", "uGhost",
             ])
                 uni[n] = gl.getUniformLocation(prog, n)
             forceDraw = true
@@ -703,7 +763,9 @@ export default function MarbleSprite({
 
             const ri = 1 - Math.max(0.01, Math.min(0.3, a.shell / 100))
             const lip = Math.max(0.3, ri - Math.max(0, a.lip / 100))
-            const br = Math.max(0.1, Math.min(ri - 0.02, a.spriteSize / 100))
+            const ghostMode = p.variant === "ghost"
+            // ghost: orb ~45% of the capsule radius so the smoke (out to ~1.1) stays inside the canvas
+            const br = ghostMode ? 0.45 : Math.max(0.1, Math.min(ri - 0.02, a.spriteSize / 100))
             const by = still ? 0 : Math.sin(clock * 0.8 - 0.9) * fl * 0.045
 
             gl.uniform2f(uni.uCenter, cx, H - cy)
@@ -736,6 +798,7 @@ export default function MarbleSprite({
             gl.uniform2f(uni.uLight, Math.cos(a.lightAngle * DEG), Math.sin(a.lightAngle * DEG))
             gl.uniform1f(uni.uDpr, Math.max(dpr, 1))
             gl.uniform1f(uni.uTime, still ? 0 : clock % 100)
+            gl.uniform1f(uni.uGhost, ghostMode ? 1 : 0)
 
             gl.drawArrays(gl.TRIANGLES, 0, 3)
         }

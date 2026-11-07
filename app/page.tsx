@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import SkillBubbles from '@/components/SkillBubbles'
-import GooeyNav from '@/components/GooeyNav'
+import SiteMenu from '@/components/SiteMenu'
 import FlowingMenu from '@/components/FlowingMenu'
 import WashingMachine from '@/components/WashingMachine'
 import PixelGhost from '@/components/PixelGhost'
@@ -37,14 +37,14 @@ const gifs = [
 function FadeIn({ children, delay=0, x=0, y=30, className='' }: { children: React.ReactNode; delay?: number; x?: number; y?: number; className?: string }) {
   return <motion.div className={className} initial={{ opacity: 0, x, y }} whileInView={{ opacity: 1, x: 0, y: 0 }} viewport={{ once: true, margin: '50px', amount: 0 }} transition={{ delay, duration: .7, ease: [.25,.1,.25,1] }}>{children}</motion.div>
 }
-function ContactButton() { return <a href="/contact" className="contact-cta">CONTACT ME <span aria-hidden="true">↗</span></a> }
-const navItems=[{label:'About',href:'#about'},{label:'Experience',href:'/experience'},{label:'Achievements',href:'/achievements'},{label:'Education',href:'/education'},{label:'Projects',href:'/projects'},{label:'Resume',href:'/resume'},{label:'Contact',href:'/contact'}]
-const navDrops=['#b600a8','#7621b0','#f6e6f8']
-const navTheme={'--gn-ink':'#fff','--gn-muted':'#fff'} as React.CSSProperties
+// every page in the site menu
+const navItems=[['Home','#home'],['About','#about'],['Experience','/experience'],['Achievements','/achievements'],['Projects','/projects'],['Education','/education'],['Resume','/resume'],['Contact','/contact']].map(([label,href])=>({label,href}))
+// small print under the socials in the menu
+const menuSmall:[string,string][]=[['Business enquiries','/contact'],['Download résumé (PDF)','/resume.pdf'],['aadityaaaaa.jaiswar@gmail.com','mailto:aadityaaaaa.jaiswar@gmail.com'],['+91 77100 24884','tel:+917710024884']]
 // pages that open with a fullscreen intro video
 const intros:Record<string,string>={'/resume':'/resume-intro.mp4','/achievements':'/achievement.mp4'}
-// let the goo travel to the clicked item before leaving; plain/modified clicks and new-tab links pass through
-const navAfterGoo=(e:React.MouseEvent)=>{
+// let the menu curtain close before leaving; plain/modified clicks and new-tab links pass through
+const navAfterClose=(e:React.MouseEvent)=>{
   const a=(e.target as HTMLElement).closest('a')
   if(!a||a.target==='_blank'||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return
   e.preventDefault()
@@ -52,8 +52,8 @@ const navAfterGoo=(e:React.MouseEvent)=>{
   const wait=matchMedia('(prefers-reduced-motion: reduce)').matches?0:700
   const intro=intros[a.pathname]
   if(!intro){setTimeout(go,wait);return}
-  // goo first, then a fullscreen intro video that fades in, fades to black, then navigates.
-  // preloads during the goo; click/Esc skips, load/play errors fall through
+  // menu closes first, then a fullscreen intro video that fades in, fades to black, then navigates.
+  // preloads while the menu closes; click/Esc skips, load/play errors fall through
   const v=document.createElement('video')
   v.src=intro;v.className='resume-intro';v.playsInline=true;v.preload='auto'
   const end=()=>{v.classList.add('out');setTimeout(go,500)}
@@ -65,15 +65,12 @@ const navAfterGoo=(e:React.MouseEvent)=>{
 }
 function Hero(){return <section className="hero" id="home">
   <HeroCharacter/>
-  <div className="hero-nav" onClickCapture={navAfterGoo}><GooeyNav items={navItems} color="#b600a8" activeTextColor="#fff" colors={navDrops} frame={false} style={navTheme} /></div>
   <div className="hero-copy">
-    <FadeIn delay={.15} y={30}><h1>Aaditya<br/>Jaiswar</h1></FadeIn>
+    {/* <FadeIn delay={.15} y={30}><h1>Aaditya<br/>Jaiswar</h1></FadeIn>
     <FadeIn delay={.3} y={20}><p className="hero-role">Software Engineer <i>|</i> AI &amp; Full-Stack Developer</p></FadeIn>
-    <FadeIn delay={.45} y={20}><p className="hero-intro">Building intelligent systems and unforgettable digital experiences.</p></FadeIn>
-    <FadeIn delay={.6} y={20}><ContactButton/></FadeIn>
+    <FadeIn delay={.45} y={20}><p className="hero-intro">Building intelligent systems and unforgettable digital experiences.</p></FadeIn> */}
   </div>
   <HeroSocials/>
-  <a href="#about" className="hero-scroll" aria-label="Scroll to about"><span/>scroll</a>
 </section>}
 function Marquee() { const [offset,setOffset]=useState(0); const ref=useRef<HTMLElement>(null); useEffect(()=>{const fn=()=>{if(ref.current)setOffset((window.scrollY-ref.current.offsetTop+window.innerHeight)*.3)}; window.addEventListener('scroll',fn,{passive:true}); return()=>window.removeEventListener('scroll',fn)},[]); return <section ref={ref} className="marquee"><div className="marquee-row" style={{transform:`translateX(${offset-200}px)`}}>{[...gifs.slice(0,11),...gifs.slice(0,11),...gifs.slice(0,11)].map((src,i)=><img key={i} src={src} alt="Selected project" loading="lazy" />)}</div><div className="marquee-row" style={{transform:`translateX(-${offset-200}px)`}}>{[...gifs.slice(11),...gifs.slice(11),...gifs.slice(11)].map((src,i)=><img key={i} src={src} alt="Selected project" loading="lazy" />)}</div></section> }
 const roles=['Software Development Engineer','Full-Stack Developer','AI & LLM Engineer','Backend & API Developer','Cloud & DevOps Engineer','Mobile App Developer','IoT Developer']
@@ -170,4 +167,4 @@ function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={
 {/* static gradient = the video's top edge as BT.709; useEdgeSync replaces it live once frames render */}
 <video ref={videoRef} src="/footer.mp4" poster="/footer-poster.jpg" autoPlay muted loop playsInline aria-hidden="true" className="w-full aspect-[2068/996] object-cover block shrink-0" />
 </section>}
-export default function Page(){return <main><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
+export default function Page(){return <main><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email').map(([n,h])=>[n,h])} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
