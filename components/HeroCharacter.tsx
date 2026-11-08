@@ -201,6 +201,9 @@ export default function HeroCharacter() {
   // Tab toggles face <-> skull (and the choice stays locked) while the hero fills the middle of the screen;
   // past the hero, or with the menu / a dialog open, Tab moves focus as usual
   useEffect(() => {
+    // Ghost Rider laugh when Tab turns the face into the skull; switching back to the face stops it
+    const laugh = new Audio('/hero/' + encodeURIComponent('GHOST RIDER SPIRIT OF VENGEANCE 3D - Laugh - In Theaters 217.mp3'))
+    laugh.preload = 'auto'
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return
       const hero = box.current?.closest('.hero')
@@ -208,9 +211,11 @@ export default function HeroCharacter() {
       if (document.querySelector('.menu[data-open], dialog[open]')) return
       e.preventDefault()
       reveal.current = !reveal.current; setOn(reveal.current)
+      if (reveal.current) { laugh.currentTime = 0; laugh.play().catch(() => {}) }
+      else laugh.pause()
     }
     addEventListener('keydown', onKey)
-    return () => removeEventListener('keydown', onKey)
+    return () => { removeEventListener('keydown', onKey); laugh.pause() }
   }, [])
 
   return <>

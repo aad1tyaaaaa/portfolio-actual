@@ -97,6 +97,7 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 .menu-btn{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:none;color:inherit;cursor:pointer;mix-blend-mode:difference}
 .burger{position:relative;width:33px;height:33px}.burger i{position:absolute;left:4px;right:4px;top:50%;height:2px;margin-top:-1px;border-radius:2px;background:currentColor;transition:transform .5s cubic-bezier(.76,0,.24,1),opacity .3s,left .4s cubic-bezier(.76,0,.24,1)}.burger i:nth-child(1){transform:translateY(-8px)}.burger i:nth-child(3){transform:translateY(8px);left:12px}.menu-btn:hover .burger i:nth-child(3){left:4px}.menu-btn[aria-expanded=true] .burger i:nth-child(1){transform:rotate(45deg)}.menu-btn[aria-expanded=true] .burger i:nth-child(2){opacity:0;transform:scaleX(0)}.menu-btn[aria-expanded=true] .burger i:nth-child(3){left:4px;transform:rotate(-45deg)}
 .topbar-logo{justify-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1;mix-blend-mode:difference}.topbar-logo i,.topbar-logo b{transition:color .3s,transform .45s cubic-bezier(.76,0,.24,1),letter-spacing .45s cubic-bezier(.76,0,.24,1)}.topbar-logo:hover i{color:#e28bed;transform:translateX(6px)}.topbar-logo:hover b{letter-spacing:.06em}.topbar-logo i{font-family:'Instrument Serif',serif;font-size:1.7rem;letter-spacing:-.01em}.topbar-logo b{font-weight:800;font-size:1.5rem;letter-spacing:-.01em}
+.topbar-mark{position:absolute;left:50%;top:50%;translate:-50% -50%;display:flex;align-items:baseline;line-height:1;color:#fff;mix-blend-mode:difference}.topbar-mark i{font-family:'Instrument Serif',serif;font-size:2.6rem}.topbar-mark b{font-weight:800;font-size:2.3rem;letter-spacing:-.02em}.topbar-mark:hover i{animation:pl-flick-a 1.6s steps(1)}.topbar-mark:hover b{animation:pl-flick-j 1.6s steps(1)}.topbar[data-open] .topbar-mark{color:#f6e6f8}.topbar-mark{transition:color .3s}.topbar .topbar-mark:hover,.topbar .topbar-mark:focus-visible{color:#e28bed}.topbar-mark:focus-visible{outline:2px solid #e28bed;outline-offset:4px}
 .topbar-cta{display:inline-flex;align-items:center;gap:.5em;padding:.7em 1.35em;border-radius:999px;background:#e28bed;color:#160b1a;font-size:1rem;font-weight:600;letter-spacing:.02em;box-shadow:0 0 0 0 rgba(226,139,237,.5);transition:background .25s,color .25s,box-shadow .35s}.topbar-cta:hover{background:#f6e6f8;box-shadow:0 0 28px 2px rgba(226,139,237,.45)}.topbar-cta span{display:inline-block;transition:transform .3s}.topbar-cta:hover span{transform:translate(2px,-2px)}
 .topbar[data-open]>*{mix-blend-mode:normal}.topbar[data-open] .menu-btn,.topbar[data-open] .topbar-logo{color:#f6e6f8}.topbar[data-open] .menu-btn:hover{color:#e28bed}
 .menu-btn:focus-visible,.topbar-cta:focus-visible,.topbar-logo:focus-visible,.menu a:focus-visible{outline:2px solid #e28bed;outline-offset:4px}
@@ -117,7 +118,9 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 .menu-strike{position:absolute;left:-3%;top:44%;width:106%;height:.3em;overflow:visible;fill:none;stroke:#e28bed;stroke-width:4;stroke-linecap:round;pointer-events:none}
 .menu-strike path{vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .3s}
 .menu[data-open] .menu-strike path{stroke-dashoffset:0;transition:stroke-dashoffset .9s ease 1.05s}
-@media(max-width:767px){.topbar{padding-block:14px}.topbar-logo i{font-size:1.25rem}.topbar-logo b{font-size:1.1rem}.topbar-cta{font-size:.85rem;padding:.6em 1em}
+/* narrow phones: compact CTA so the centred aJ mark has room between it and the logo */
+@media(max-width:420px){.topbar .topbar-cta{font-size:.78rem;padding:.55em .9em}.topbar-cta span{display:none}}
+@media(max-width:767px){.topbar-mark i{font-size:1.7rem}.topbar-mark b{font-size:1.5rem}.topbar{padding-block:14px}.topbar-logo i{font-size:1.25rem}.topbar-logo b{font-size:1.1rem}.topbar-cta{font-size:.85rem;padding:.6em 1em}
   .menu{grid-template-columns:1fr;align-content:center;gap:40px;padding:96px 20px 40px}.menu-nav{order:-1}.menu-link{font-size:clamp(2.2rem,11vw,3.4rem)}
   .menu-side{gap:24px}.menu-socials{display:flex;flex-wrap:wrap;gap:4px 18px}.menu-socials a{font-size:1rem}}
 @media(prefers-reduced-motion:reduce){.menu,.menu *,.burger i{transition-duration:.01s!important;transition-delay:0s!important}}
@@ -175,6 +178,12 @@ html{scrollbar-gutter:stable}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(#9d3cd1,#d21cc4 55%,#f0a8f8)}
 ::-webkit-scrollbar-corner{background:#0c0c0c}
 @supports not selector(::-webkit-scrollbar){html{scrollbar-color:#b600a8 #0c0c0c;scrollbar-width:thin}}
+
+/* badges page spiral: round badges, no card frame; the clicked one gets a pink ring + purple glow
+   (plain CSS: the component's own stylesheet is unlayered, so Tailwind utilities can't override it) */
+.badge-spiral .infinite-spiral__item{border:0;background:none;box-shadow:none;transition:box-shadow .3s}
+.badge-spiral .infinite-spiral__item[data-active]{box-shadow:0 0 0 4px #e28bed,0 0 48px 12px #b600a8cc}
+.badge-spiral .infinite-spiral__item:focus-visible{outline:2px solid #e28bed;outline-offset:4px}
 
 /* phones only: about copy wraps at word boundaries (per-letter inline-blocks split words mid-letter on narrow lines);
    explore rows shrink so each label fits the screen width */

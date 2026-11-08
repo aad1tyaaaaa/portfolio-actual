@@ -31,7 +31,8 @@ export default function Experience() {
     <section className="relative w-full h-screen max-md:h-auto max-md:min-h-dvh overflow-hidden bg-black">
       <BackButton />
       {roles.map((v, i) => (
-        <video key={v.video} src={v.video} autoPlay muted loop playsInline
+        // React leaves `muted` out of the server HTML, so mobile browsers refuse to autoplay; set it and start playback on mount
+        <video key={v.video} src={v.video} autoPlay muted loop playsInline ref={el => { if (el) { el.muted = true; el.play().catch(() => {}) } }}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${i === active ? 'opacity-100' : 'opacity-0'}`} />
       ))}
 

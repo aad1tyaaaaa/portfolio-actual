@@ -61,6 +61,8 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
   return <>
     <header className="topbar" data-open={open || undefined}>
       <a href="/" className="topbar-logo" aria-label="Aaditya Jaiswar, home" onClick={() => setOpen(false)}><i>aaditya</i><b>JAISWAR</b></a>
+      {/* the preloader's aJ monogram, centred in the bar */}
+      <a href="/" className="topbar-mark" aria-label="Home" onClick={() => setOpen(false)}><i>a</i><b>J</b></a>
       <a href={cta.href} className="topbar-cta" onClick={e => go(e, cta.href)}>{cta.label} <span aria-hidden="true">↗</span></a>
       <button ref={btn} type="button" className="menu-btn" aria-expanded={open} aria-controls="site-menu" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(o => !o)}>
         <span className="burger" aria-hidden="true"><i /><i /><i /></span>
