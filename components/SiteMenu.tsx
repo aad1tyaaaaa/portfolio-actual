@@ -9,8 +9,8 @@ import { useEffect, useRef, useState } from 'react'
   closing retracts the panel upward.
 */
 
-export type MenuItem = { label: string; href: string }
-type Link = [label: string, href: string]
+export type MenuItem = { label: string; href: string; icon?: React.ReactNode }
+type Link = [label: string, href: string, icon?: React.ReactNode]
 
 const ext = (href: string) => (/^https?:/.test(href) ? { target: '_blank', rel: 'noreferrer' } : {})
 
@@ -75,9 +75,6 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
       <video ref={bgVid} className="menu-bg" src="/hero/background-loop.mp4" muted loop playsInline preload="none" aria-hidden="true" />
 
       <aside className="menu-side">
-        <ul className="menu-socials" aria-label="Social">
-          {socials.map(([name, href], i) => <li key={name} style={{ '--i': i } as React.CSSProperties}><a href={href} {...ext(href)}>{name}</a></li>)}
-        </ul>
         <ul className="menu-small">
           {small.map(([name, href], i) => <li key={name} style={{ '--i': i } as React.CSSProperties}><a href={href} {...ext(href)} onClick={e => go(e, href)}>{name}</a></li>)}
         </ul>
@@ -86,6 +83,7 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
       <nav className="menu-nav" aria-label="Site">
         <ul>
           {items.map((it, i) => <li key={it.href} style={{ '--i': i } as React.CSSProperties}>
+            {it.icon && <span className="menu-link-icon" aria-hidden="true">{it.icon}</span>}
             <a className="menu-link" href={it.href} aria-current={i === current ? 'page' : undefined}
               onClick={e => { setOpen(false); onNavigate?.(e) }}>
               {it.label}
@@ -96,6 +94,11 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
           </li>)}
         </ul>
       </nav>
+
+      {/* socials: a vertical icon rail to the right of the big links (a row under them on mobile) */}
+      <ul className="menu-socials" aria-label="Social">
+        {socials.map(([name, href, icon], i) => <li key={name} style={{ '--i': i } as React.CSSProperties}><a href={href} {...ext(href)} aria-label={icon ? name : undefined} title={icon ? name : undefined}>{icon ?? name}</a></li>)}
+      </ul>
     </div>
   </>
 }

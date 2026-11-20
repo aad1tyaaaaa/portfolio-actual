@@ -1,6 +1,6 @@
 // webp copies of public/characteridesign/*.png (full + 360px thumb for the explore marquee)
 export const characters = [
-  'Bloodstained Gothic Chainbound Warrior',
+  'Bandaged Chainbound Wraith in White Fur',
   'Chained Grimdark Berserker with Spiked Maul',
   'Gothic Chainbound Executioner',
   'Gritty Spiked Punk Antihero',

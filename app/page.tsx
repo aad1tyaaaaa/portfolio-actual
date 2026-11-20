@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, House, User, Briefcase, Trophy, FolderKanban, GraduationCap, FileText, Mail } from 'lucide-react'
 import SkillBubbles from '@/components/SkillBubbles'
 import SiteMenu from '@/components/SiteMenu'
 import FlowingMenu from '@/components/FlowingMenu'
@@ -41,7 +41,7 @@ function FadeIn({ children, delay=0, x=0, y=30, className='' }: { children: Reac
   return <motion.div className={className} initial={{ opacity: 0, x, y }} whileInView={{ opacity: 1, x: 0, y: 0 }} viewport={{ once: true, margin: '50px', amount: 0 }} transition={{ delay, duration: .7, ease: [.25,.1,.25,1] }}>{children}</motion.div>
 }
 // every page in the site menu
-const navItems=[['Home','/'],['About','#about'],['Experience','/experience'],['Achievements','/achievements'],['Projects','/projects'],['Education','/education'],['Resume','/resume'],['Contact','/contact']].map(([label,href])=>({label,href}))
+const navItems=([['Home','/',House],['About','#about',User],['Experience','/experience',Briefcase],['Achievements','/achievements',Trophy],['Projects','/projects',FolderKanban],['Education','/education',GraduationCap],['Resume','/resume',FileText],['Contact','/contact',Mail]] as const).map(([label,href,Icon])=>({label,href,icon:<Icon/>}))
 // small print under the socials in the menu
 const menuSmall:[string,string][]=[['Business enquiries','/contact'],['Download résumé (PDF)','/resume.pdf'],['aadityaaaaa.jaiswar@gmail.com','mailto:aadityaaaaa.jaiswar@gmail.com'],['+91 77100 24884','tel:+917710024884']]
 // links to this page or a section of it scroll instead of reloading / leaving #hash in the address bar
@@ -189,4 +189,4 @@ function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={
 export default function Page(){
 // old /#home bookmarks: drop the hash (the hero is the top of the page anyway)
 useEffect(()=>{if(location.hash==='#home')history.replaceState(null,'',location.pathname+location.search)},[])
-return <main onClick={onPageClick}><Preloader/><Mascot/><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email').map(([n,h])=>[n,h])} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
+return <main onClick={onPageClick}><Preloader/><Mascot/><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email')} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}

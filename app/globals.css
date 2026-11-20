@@ -102,7 +102,7 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 .topbar[data-open]>*{mix-blend-mode:normal}.topbar[data-open] .menu-btn,.topbar[data-open] .topbar-logo{color:#f6e6f8}.topbar[data-open] .menu-btn:hover{color:#e28bed}
 .menu-btn:focus-visible,.topbar-cta:focus-visible,.topbar-logo:focus-visible,.menu a:focus-visible{outline:2px solid #e28bed;outline-offset:4px}
 /* curtain: closed = zero-height ellipse hugging the top edge; open = ellipse far past the bottom (curved leading edge on the way) */
-.menu{--ease:cubic-bezier(.76,0,.24,1);position:fixed;inset:0;z-index:100;isolation:isolate;display:grid;grid-template-columns:44% 1fr;align-items:center;padding:110px clamp(16px,4.5vw,80px) 80px;background:#13071a;color:#f6e6f8;clip-path:ellipse(120% 0% at 50% 0%);visibility:hidden;transition:clip-path .8s var(--ease),visibility 0s .8s}
+.menu{--ease:cubic-bezier(.76,0,.24,1);position:fixed;inset:0;z-index:100;isolation:isolate;display:grid;grid-template-columns:36% max-content max-content;column-gap:clamp(28px,3.5vw,64px);align-items:center;padding:110px clamp(16px,4.5vw,80px) 80px;background:#13071a;color:#f6e6f8;clip-path:ellipse(120% 0% at 50% 0%);visibility:hidden;transition:clip-path .8s var(--ease),visibility 0s .8s}
 .menu[data-open]{clip-path:ellipse(120% 100% at 50% 20%);visibility:visible;transition:clip-path .9s var(--ease),visibility 0s}
 .menu-bg{position:absolute;inset:0;z-index:-1;width:100%;height:100%;object-fit:cover;opacity:.35;pointer-events:none}
 .menu ul{list-style:none}
@@ -112,23 +112,46 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 .menu-socials a:hover,.menu-small a:hover{color:#e28bed}
 .menu-socials li,.menu-small li{opacity:0;translate:0 12px;transition:opacity .3s,translate .3s}
 .menu[data-open] .menu-socials li,.menu[data-open] .menu-small li{opacity:1;translate:0 0;transition:opacity .6s ease calc(.55s + var(--i) * .04s),translate .6s var(--ease) calc(.55s + var(--i) * .04s)}
+/* socials as brand icons (same set as the hero rail), a column right of the big links */
+.menu-socials{display:grid;gap:clamp(10px,1.6vh,16px)}.menu-socials a{display:block;line-height:0;border-radius:12px;transition:transform .25s var(--ease),box-shadow .25s}.menu-socials svg{display:block;width:clamp(40px,3.2vw,52px);height:auto;border-radius:inherit}.menu-socials a:hover,.menu-socials a:focus-visible{transform:translateY(-3px) scale(1.06);box-shadow:0 8px 22px #e28bed55}
 .menu-link{position:relative;display:inline-block;padding:0 .04em;font-size:clamp(2.4rem,min(5.4vw,9.6svh),5.6rem);font-weight:700;line-height:1.02;letter-spacing:-.025em;color:#f6e6f8;clip-path:ellipse(30% 0% at 50% 0%);translate:0 35%;transition:clip-path .45s var(--ease),translate .45s var(--ease),color .25s}
 .menu[data-open] .menu-link{clip-path:ellipse(120% 100% at 50% 20%);translate:0 0;transition:clip-path .9s var(--ease) calc(.35s + var(--i) * .05s),translate .9s var(--ease) calc(.35s + var(--i) * .05s),color .25s}
 .menu-link:hover,.menu-link:focus-visible{color:#e28bed}
+/* an icon beside each big link: same size scale as the link, fades/rises in with it, lights up with the link's hover */
+.menu-nav li{display:flex;align-items:center;gap:.28em;font-size:clamp(2.4rem,min(5.4vw,9.6svh),5.6rem)}
+.menu-link-icon{display:grid;place-items:center;flex:none;width:.62em;height:.62em;border-radius:.16em;background:#e28bed1f;color:#e28bed;opacity:0;translate:0 35%;transition:opacity .45s,translate .45s var(--ease),background .25s,color .25s}
+.menu-link-icon svg{width:56%;height:56%;stroke-width:2.2}
+.menu[data-open] .menu-link-icon{opacity:1;translate:0 0;transition:opacity .9s ease calc(.35s + var(--i) * .05s),translate .9s var(--ease) calc(.35s + var(--i) * .05s),background .25s,color .25s}
+.menu-nav li:has(.menu-link:hover,.menu-link:focus-visible) .menu-link-icon,.menu-nav li:has([aria-current=page]) .menu-link-icon{background:#e28bed;color:#13071a}
 .menu-strike{position:absolute;left:-3%;top:44%;width:106%;height:.3em;overflow:visible;fill:none;stroke:#e28bed;stroke-width:4;stroke-linecap:round;pointer-events:none}
 .menu-strike path{vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .3s}
 .menu[data-open] .menu-strike path{stroke-dashoffset:0;transition:stroke-dashoffset .9s ease 1.05s}
 /* narrow phones: compact CTA so the centred aJ mark has room between it and the logo */
 @media(max-width:420px){.topbar .topbar-cta{font-size:.78rem;padding:.55em .9em}.topbar-cta span{display:none}}
 @media(max-width:767px){.topbar-mark i{font-size:1.7rem}.topbar-mark b{font-size:1.5rem}.topbar{padding-block:14px}.topbar-logo i{font-size:1.25rem}.topbar-logo b{font-size:1.1rem}.topbar-cta{font-size:.85rem;padding:.6em 1em}
-  .menu{grid-template-columns:1fr;align-content:center;gap:40px;padding:96px 20px 40px}.menu-nav{order:-1}.menu-link{font-size:clamp(2.2rem,11vw,3.4rem)}
-  .menu-side{gap:24px}.menu-socials{display:flex;flex-wrap:wrap;gap:4px 18px}.menu-socials a{font-size:1rem}}
+  .menu{grid-template-columns:1fr;align-content:center;gap:40px;padding:96px 20px 40px}.menu-nav{order:-1}.menu-link,.menu-nav li{font-size:clamp(2.2rem,11vw,3.4rem)}
+  .menu-side{gap:24px;order:1}.menu-socials{justify-self:start;grid-template-columns:repeat(8,minmax(0,44px));gap:8px}.menu-socials svg{width:100%}}
 @media(prefers-reduced-motion:reduce){.menu,.menu *,.burger i{transition-duration:.01s!important;transition-delay:0s!important}}
 
 /* home music control: bottom-right, same column as the hamburger + socials; slider slides out on hover/focus */
 .home-audio{position:fixed;z-index:105;right:var(--edge);bottom:24px;display:flex;align-items:center;height:44px;border-radius:999px;border:1px solid #ffffff26;background:#0006;backdrop-filter:blur(12px);color:#f6e6f8;transition:border-color .3s}
 .home-audio:hover,.home-audio:focus-within{border-color:#e28bed}
-.home-audio-btn{display:grid;place-items:center;width:42px;height:42px;flex:none;border:0;border-radius:999px;background:none;color:inherit;cursor:pointer;transition:color .2s}.home-audio-btn:hover{color:#e28bed}
+.home-audio{padding:0 3px}
+.home-audio-sides{position:relative;display:flex;isolation:isolate}
+.home-audio-sides::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:0;width:50%;border-radius:999px;background:linear-gradient(135deg,#f0a6f7,#c46cf0);box-shadow:0 0 18px #e28bed73,inset 0 1px 0 #ffffff59;transition:transform .5s cubic-bezier(.76,0,.24,1),opacity .3s}
+.home-audio-sides[data-side="2"]::before{transform:translateX(100%)}
+.home-audio-sides:not([data-playing])::before{opacity:.55}
+.home-audio-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:62px;height:36px;flex:none;border:0;border-radius:999px;background:none;color:#f6e6f8a6;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;transition:color .3s}
+.home-audio-btn:not([data-active]):hover{color:#e28bed}
+.home-audio-btn[data-active]{color:#1a0b20}
+.home-audio-eq{display:none;align-items:flex-end;gap:2px;height:11px}
+.home-audio-btn[data-active] .home-audio-eq{display:flex}
+.home-audio-eq i{width:2px;height:100%;border-radius:1px;background:currentColor;transform-origin:bottom;transform:scaleY(.3)}
+[data-playing] .home-audio-eq i{animation:home-eq .8s ease-in-out infinite alternate}
+[data-playing] .home-audio-eq i:nth-child(2){animation-delay:-.4s;animation-duration:.6s}
+[data-playing] .home-audio-eq i:nth-child(3){animation-delay:-.2s;animation-duration:.95s}
+@keyframes home-eq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+@media(prefers-reduced-motion:reduce){.home-audio-sides::before{transition:none}[data-playing] .home-audio-eq i{animation:none;transform:scaleY(.7)}}
 .home-audio-btn:focus-visible,.home-audio-slider input:focus-visible{outline:2px solid #e28bed;outline-offset:3px}
 .home-audio-slider{display:flex;align-items:center;align-self:stretch;width:0;overflow:hidden;opacity:0;transition:width .45s cubic-bezier(.76,0,.24,1),opacity .3s,padding .45s cubic-bezier(.76,0,.24,1)}
 .home-audio:hover .home-audio-slider,.home-audio:focus-within .home-audio-slider{width:112px;padding-left:16px;opacity:1}
@@ -193,3 +216,17 @@ html{scrollbar-gutter:stable}
   .explore .flowing-menu__label{font-size:clamp(16px,min(40cqh,6.4cqw),140px)}
   .explore .flowing-menu__meta{display:none}
 }
+
+/* characters page: game-style idle loop. breathe (stretch from the feet) + a slow weight-shift sway; each card is offset so they never move in sync */
+.char-idle{transform-origin:50% 100%;animation:char-idle 3.6s ease-in-out infinite}
+@keyframes char-idle{0%,100%{transform:translateY(0) scale(1,1) rotate(0)}25%{transform:translateY(-4px) scale(.995,1.018) rotate(-.6deg)}50%{transform:translateY(-1px) scale(1,1.006) rotate(0)}75%{transform:translateY(-5px) scale(.995,1.02) rotate(.6deg)}}
+@media(prefers-reduced-motion:reduce){.char-idle{animation:none}}
+/* character select: side previews, slide-in on change, round arrow buttons at the edges */
+.char-side{opacity:.6;filter:brightness(.7) saturate(.7) drop-shadow(0 0 18px #0009)}
+.char-enter{animation:char-enter .5s cubic-bezier(.22,1,.36,1) both}
+@keyframes char-enter{from{opacity:0;transform:translateX(var(--from)) scale(.96)}}
+.char-nav{position:absolute;top:50%;z-index:1;display:grid;place-items:center;width:56px;height:56px;translate:0 -50%;border:1px solid #ffffff33;border-radius:999px;background:#0009;backdrop-filter:blur(10px);color:#f6e6f8;cursor:pointer;transition:background .25s,color .25s,border-color .25s,scale .2s}
+.char-nav:hover{background:#e28bed;border-color:#e28bed;color:#13071a}.char-nav:active{scale:.92}
+.char-nav:focus-visible{outline:2px solid #e28bed;outline-offset:3px}
+.char-nav svg{width:28px;height:28px}
+@media(prefers-reduced-motion:reduce){.char-enter{animation:none}}

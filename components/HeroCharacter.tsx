@@ -151,6 +151,9 @@ export default function HeroCharacter() {
 
     let ready = false, full = 0, raf = 0, prev = performance.now(), time = 0, visible = true
     img.decode().catch(() => {}).then(() => { faceTex.image = img; ready = true; el.classList.add('gl') })
+    // S2 (HomeAudio) swaps the face src; re-upload the texture when the new image lands
+    const swap = () => { faceTex.image = img; faceTex.needsUpdate = true }
+    img.addEventListener('load', swap)
     const rm = matchMedia('(prefers-reduced-motion: reduce)')
 
     const frame = (now: number) => {
@@ -190,7 +193,7 @@ export default function HeroCharacter() {
     io.observe(el)
 
     return () => {
-      cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); el.classList.remove('gl')
+      cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); el.classList.remove('gl'); img.removeEventListener('load', swap)
       removeEventListener('pointermove', move)
       document.documentElement.removeEventListener('pointerleave', leave)
     }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Volume1, Volume2, VolumeX } from 'lucide-react'
 
 // Home-page music. Browsers block audible autoplay until the visitor interacts, so if play() is
 // refused we start on the first click/tap/key. Mute + volume are remembered for the next visit.
@@ -10,6 +9,7 @@ export default function HomeAudio({ src }: { src: string }) {
   const audio = useRef<HTMLAudioElement>(null)
   const [muted, setMuted] = useState(false)
   const [vol, setVol] = useState(0.5)
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     const a = audio.current!
@@ -22,7 +22,7 @@ export default function HomeAudio({ src }: { src: string }) {
     setMuted(off); setVol(v); a.volume = v
     // while the music plays the hero swaps its background for the moon (CSS: html[data-music])
     const root = document.documentElement
-    const sync = () => { if (a.paused) delete root.dataset.music; else root.dataset.music = '' }
+    const sync = () => { setPlaying(!a.paused); if (a.paused) delete root.dataset.music; else root.dataset.music = '' }
     a.addEventListener('play', sync); a.addEventListener('pause', sync)
     const cleanup = () => { a.removeEventListener('play', sync); a.removeEventListener('pause', sync); delete root.dataset.music }
     if (off) return cleanup
@@ -47,7 +47,18 @@ export default function HomeAudio({ src }: { src: string }) {
   }
 
   const silent = muted || vol === 0
-  const Icon = silent ? VolumeX : vol < 0.5 ? Volume1 : Volume2
+  // S1 / S2 are two "sides": clicking the inactive one switches face + track; clicking the active one plays / pauses
+  const [s2, setS2] = useState(false)
+  const toggle = () => { if (!silent && !audio.current!.paused) return setMute(true); if (vol === 0) change(0.5); setMute(false) }
+  const side = (next: boolean) => {
+    if (next === s2) return toggle()
+    const f = document.querySelector<HTMLImageElement>('.char-face') // HeroCharacter re-uploads the texture on load
+    if (f) f.src = next ? '/hero/face-s2.webp' : '/hero/face-cutout.webp'
+    audio.current!.src = next ? encodeURI('/mix_3m12s (audio-joiner.com).mp3') : src
+    setS2(next)
+    if (vol === 0) change(0.5)
+    setMute(false)
+  }
 
   return <div className="home-audio">
     <audio ref={audio} src={src} loop preload="auto" />
@@ -56,9 +67,15 @@ export default function HomeAudio({ src }: { src: string }) {
       <input type="range" min={0} max={1} step={0.05} value={silent ? 0 : vol}
         onChange={e => change(+e.target.value)} style={{ '--v': `${(silent ? 0 : vol) * 100}%` } as React.CSSProperties} />
     </label>
-    <button type="button" onClick={() => { if (!silent && !audio.current!.paused) return setMute(true); if (vol === 0) change(0.5); setMute(false) }} aria-pressed={!silent}
-      aria-label={silent ? 'Turn music on' : 'Turn music off'} className="home-audio-btn">
-      <Icon size={20} />
-    </button>
+    {/* segmented toggle: a pill slides under the active side; its equalizer bars move while the track plays */}
+    <div className="home-audio-sides" data-side={s2 ? 2 : 1} data-playing={playing || undefined}>
+      {[false, true].map(isS2 => {
+        const active = isS2 === s2
+        return <button key={+isS2} type="button" onClick={() => side(isS2)} aria-pressed={active && playing} data-active={active || undefined}
+          aria-label={!active ? `Switch to ${isS2 ? 'S2' : 'S1'}` : playing ? 'Pause music' : 'Play music'} className="home-audio-btn">
+          <span className="home-audio-eq" aria-hidden="true"><i /><i /><i /></span>{isS2 ? 'S2' : 'S1'}
+        </button>
+      })}
+    </div>
   </div>
 }
