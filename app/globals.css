@@ -92,7 +92,7 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 /* WebGL reveal (HeroCharacter): canvas takes over once ready; the DOM video/img stay mounted (and playing) as texture sources */
 .char-gl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .5s}.char.gl+.char-gl{opacity:1}.char.gl>.char-skull,.char.gl>.char-face{opacity:0!important;transition:none}
 @media(hover:hover){.char.gl .char-hit{cursor:default}}
-/* site menu (SiteMenu.tsx): socials + small print left, big links from the centre; curved clip-path curtain */
+/* site menu (SiteMenu.tsx): small print bottom-left, big links centred, social rail right; curved clip-path curtain */
 .topbar,.hero-socials,.home-audio{--edge:clamp(16px,3vw,48px)}.topbar{position:fixed;z-index:110;top:0;left:0;right:0;display:grid;grid-template-columns:1fr auto auto;align-items:center;column-gap:clamp(16px,2.4vw,36px);padding:20px var(--edge);pointer-events:none;color:#fff}.topbar>*{pointer-events:auto}
 .menu-btn{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:none;color:inherit;cursor:pointer;mix-blend-mode:difference}
 .burger{position:relative;width:33px;height:33px}.burger i{position:absolute;left:4px;right:4px;top:50%;height:2px;margin-top:-1px;border-radius:2px;background:currentColor;transition:transform .5s cubic-bezier(.76,0,.24,1),opacity .3s,left .4s cubic-bezier(.76,0,.24,1)}.burger i:nth-child(1){transform:translateY(-8px)}.burger i:nth-child(3){transform:translateY(8px);left:12px}.menu-btn:hover .burger i:nth-child(3){left:4px}.menu-btn[aria-expanded=true] .burger i:nth-child(1){transform:rotate(45deg)}.menu-btn[aria-expanded=true] .burger i:nth-child(2){opacity:0;transform:scaleX(0)}.menu-btn[aria-expanded=true] .burger i:nth-child(3){left:4px;transform:rotate(-45deg)}
@@ -102,11 +102,12 @@ main{overflow-x:clip;background:#0c0c0c}.hero{height:100svh;min-height:540px;pos
 .topbar[data-open]>*{mix-blend-mode:normal}.topbar[data-open] .menu-btn,.topbar[data-open] .topbar-logo{color:#f6e6f8}.topbar[data-open] .menu-btn:hover{color:#e28bed}
 .menu-btn:focus-visible,.topbar-cta:focus-visible,.topbar-logo:focus-visible,.menu a:focus-visible{outline:2px solid #e28bed;outline-offset:4px}
 /* curtain: closed = zero-height ellipse hugging the top edge; open = ellipse far past the bottom (curved leading edge on the way) */
-.menu{--ease:cubic-bezier(.76,0,.24,1);position:fixed;inset:0;z-index:100;isolation:isolate;display:grid;grid-template-columns:36% max-content max-content;column-gap:clamp(28px,3.5vw,64px);align-items:center;padding:110px clamp(16px,4.5vw,80px) 80px;background:#13071a;color:#f6e6f8;clip-path:ellipse(120% 0% at 50% 0%);visibility:hidden;transition:clip-path .8s var(--ease),visibility 0s .8s}
+.menu{--ease:cubic-bezier(.76,0,.24,1);position:fixed;inset:0;z-index:100;isolation:isolate;display:grid;grid-template-columns:1fr max-content 1fr;column-gap:clamp(28px,3.5vw,64px);align-items:center;padding:110px clamp(16px,3vw,48px) 48px;background:#13071a;color:#f6e6f8;clip-path:ellipse(120% 0% at 50% 0%);visibility:hidden;transition:clip-path .8s var(--ease),visibility 0s .8s}
 .menu[data-open]{clip-path:ellipse(120% 100% at 50% 20%);visibility:visible;transition:clip-path .9s var(--ease),visibility 0s}
 .menu-bg{position:absolute;inset:0;z-index:-1;width:100%;height:100%;object-fit:cover;opacity:.35;pointer-events:none}
 .menu ul{list-style:none}
-.menu-side{align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:clamp(48px,14vh,150px)}
+.menu-side{align-self:end;display:flex;flex-direction:column;gap:clamp(48px,14vh,150px)}
+.menu-socials{justify-self:center}
 .menu-socials a{display:inline-block;font-size:clamp(1.1rem,1.55vw,1.6rem);font-weight:500;line-height:1.45;transition:color .2s}
 .menu-small a{display:inline-block;font-size:clamp(.8rem,.85vw,.95rem);font-weight:400;line-height:1.75;color:#f6e6f8cc;transition:color .2s}
 .menu-socials a:hover,.menu-small a:hover{color:#e28bed}

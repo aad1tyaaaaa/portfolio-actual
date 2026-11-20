@@ -5,7 +5,12 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Aaditya Jaiswar -- Software Engineer',
   description: 'Aaditya Jaiswar is a software engineer building full-stack, AI and LLM-powered products.',
-  generator: 'v0.app',
+  openGraph: {
+    title: 'Aaditya Jaiswar -- Software Engineer',
+    description: 'Aaditya Jaiswar is a software engineer building full-stack, AI and LLM-powered products.',
+    images: '/home.png',
+  },
+  twitter: { card: 'summary_large_image', images: '/home.png' },
   icons: {
     icon: '/face.png',
     apple: '/face.png',

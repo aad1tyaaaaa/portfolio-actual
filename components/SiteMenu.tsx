@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 /*
-  Full-screen menu. Layout: socials + small links on the left, big page links from the centre;
+  Full-screen menu. Layout: small links bottom-left, big page links centred, social rail on the right;
   top bar: logo left, CTA pill + hamburger (morphs to X) right. Motion: the panel drops from the top with a
   curved (ellipse clip-path) edge, links rise in staggered, the current page gets a hand-drawn strike;
   closing retracts the panel upward.
