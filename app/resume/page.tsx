@@ -2,24 +2,26 @@ import { ArrowUpRight, Download } from 'lucide-react'
 import BackButton from '@/components/BackButton'
 import MoltenMetal from '@/components/MoltenMetal'
 
-// Hotspots over /resume.webp, in % of the page (pulled from the PDF's link annotations).
-// ponytail: hand-copied from resume.pdf; re-extract if the PDF layout changes.
-// The PDF itself mislinks LinkedIn/email to GitHub and doubles the Blackbox URL; these are the intended targets.
+// Hotspots over /resume.webp, in % of the page. Rendered + read from resume.pdf with pdf.js (render at 1787px wide,
+// Link annotations -> %). ponytail: hand-curated from that dump; re-extract if the PDF layout changes.
+// Curation: icon + label rects merged into one hotspot; project rows grown ~0.7% down because the PDF's own rects sit
+// half a line above their text; stale annotations left over from an older layout (Negotiara / supply-chain over the
+// PROJECTS heading, stray TerraQ boxes on a Black Box line) dropped; phone + email added (the PDF doesn't link them).
 const links = [
-  { label: 'Call +91 77100 24884', href: 'tel:+917710024884', x: 34.81, y: 2.18, w: 12.85, h: 1.3 },
-  { label: 'Email aadityaaaaa.jaiswar@gmail.com', href: 'mailto:aadityaaaaa.jaiswar@gmail.com', x: 49.66, y: 2.17, w: 24.74, h: 1.55 },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/aadityaaaaa', x: 12.36, y: 3.3, w: 34.04, h: 1.5 },
-  { label: 'GitHub', href: 'https://github.com/aad1tyaaaaa', x: 55.2, y: 3.35, w: 25.95, h: 1.43 },
-  { label: 'Negotiara AI live', href: 'https://negotiara-main.vercel.app/', x: 3.39, y: 60.19, w: 35.02, h: 1.34 },
-  { label: 'Negotiara AI on GitHub', href: 'https://github.com/aad1tyaaaaa/Negotiara-main', x: 39.94, y: 60.33, w: 4.66, h: 1.34 },
-  { label: 'Provenyx live', href: 'https://provenyx.vercel.app/', x: 3.08, y: 66.45, w: 44.83, h: 1.34 },
-  { label: 'Provenyx VS Code extension', href: 'https://marketplace.visualstudio.com/items?itemName=OmkarPramodBandikatte.provenyx-security', x: 49.05, y: 66.45, w: 10.21, h: 1.34 },
-  { label: 'Provenyx on GitHub', href: 'https://github.com/aad1tyaaaaa/Provenyx', x: 60.93, y: 66.45, w: 4.66, h: 1.34 },
-  { label: 'Black Box live', href: 'https://blackbox-five-alpha.vercel.app/?ws=nimbu', x: 3.09, y: 75.05, w: 30.76, h: 1.4 },
-  { label: 'Black Box on GitHub', href: 'https://github.com/aad1tyaaaaa/Blackbox', x: 35.3, y: 75.09, w: 4.66, h: 1.34 },
-  { label: 'TerraQ live', href: 'https://terra-q-seven.vercel.app/', x: 2.79, y: 83.9, w: 45.69, h: 1.34 },
-  { label: 'TerraQ on GitHub', href: 'https://github.com/aad1tyaaaaa/TerraQ', x: 49.59, y: 83.84, w: 4.37, h: 1.34 },
-  { label: 'ArogyaSense on GitHub', href: 'https://github.com/aad1tyaaaaa/ArogyaSense', x: 57.15, y: 92.13, w: 9.83, h: 1.34 },
+  { label: 'Call +91 77100 24884', href: 'tel:+917710024884', x: 4.1, y: 4.2, w: 15.5, h: 1.4 },
+  { label: 'Email aadityaaaaa.jaiswar@gmail.com', href: 'mailto:aadityaaaaa.jaiswar@gmail.com', x: 23.1, y: 4.2, w: 27.6, h: 1.4 },
+  { label: 'Portfolio', href: 'https://aadityaaaaa.vercel.app/', x: 55.35, y: 4.16, w: 21.43, h: 1.44 },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/aadityaaaaa', x: 12.9, y: 5.91, w: 35.76, h: 1.41 },
+  { label: 'GitHub', href: 'https://github.com/aad1tyaaaaa', x: 53.9, y: 5.91, w: 32.61, h: 1.41 },
+  { label: 'FeedingHands live', href: 'https://feeding-hands-olive.vercel.app/', x: 42.6, y: 61.36, w: 8.24, h: 2.05 },
+  { label: 'FeedingHands on GitHub', href: 'https://github.com/aad1tyaaaaa/FeedingHands', x: 54.02, y: 61.36, w: 9.69, h: 2.05 },
+  { label: 'Provenyx live', href: 'https://provenyx.vercel.app/', x: 44.19, y: 69.74, w: 8.04, h: 2.05 },
+  { label: 'Provenyx on GitHub', href: 'https://github.com/aad1tyaaaaa/Provenyx', x: 55.41, y: 69.74, w: 9.68, h: 2.05 },
+  { label: 'Provenyx VS Code extension', href: 'https://marketplace.visualstudio.com/items?itemName=OmkarPramodBandikatte.provenyx-security', x: 67.35, y: 69.5, w: 12.34, h: 2.25 },
+  { label: 'Black Box live', href: 'https://blackbox-five-alpha.vercel.app/?ws=nimbu', x: 30.82, y: 77.32, w: 8.24, h: 2.05 },
+  { label: 'Black Box on GitHub', href: 'https://github.com/aad1tyaaaaa/Blackbox', x: 42.24, y: 77.32, w: 9.68, h: 2.05 },
+  { label: 'TerraQ live', href: 'https://terra-q-seven.vercel.app/', x: 44.27, y: 85.12, w: 8.24, h: 2.05 },
+  { label: 'TerraQ on GitHub', href: 'https://github.com/aad1tyaaaaa/TerraQ', x: 55.69, y: 85.12, w: 9.69, h: 2.05 },
 ]
 
 export default function Resume() {
