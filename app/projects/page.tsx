@@ -9,7 +9,7 @@ import LetterSwap from '@/components/LetterSwap'
 import { projects } from '@/lib/projects'
 
 // screenshots taken with headless Edge (1440x900); re-shoot into /public/projects when a site changes, same order as lib/projects
-const shots = ['provenyx', 'blackbox', 'terraq', 'negotiara', 'parth-ngo']
+const shots = ['provenyx', 'blackbox', 'terraq', 'negotiara', 'parth-ngo', 'feeding-hands']
 // module-level so the carousel's WebGL engine isn't rebuilt every render
 const items = projects.map(([, cat, title], i) => ({ src: `/projects/${shots[i]}.png`, alt: `${title} homepage`, title, subtitle: cat }))
 

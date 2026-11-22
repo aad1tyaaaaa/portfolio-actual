@@ -177,7 +177,8 @@ export default function HeroCharacter() {
       const tu = trail.program.uniforms, cu = comp.program.uniforms
       const aspect = cv.width / cv.height
       tu.tPrev.value = read.texture; tu.uA.value = [last.x, last.y]; tu.uB.value = [eased.x, eased.y]
-      tu.uActive.value = target.in ? 1 : 0; tu.uR.value = .12 + Math.min(speed * .03, .07)
+      // no trail while HomeAudio's music plays (S1/S2 on); pausing it brings the trail back
+      tu.uActive.value = target.in && !('music' in document.documentElement.dataset) ? 1 : 0; tu.uR.value = .12 + Math.min(speed * .03, .07)
       tu.uDecay.value = .45 * dt; tu.uAspect.value = aspect; tu.uTime.value = time
       renderer.render({ scene: trail, target: write });
       [read, write] = [write, read]
@@ -225,6 +226,8 @@ export default function HeroCharacter() {
     <video ref={bg} className="hero-bg" src="/hero/background-loop.mp4" autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
     {/* shown while the home music plays (html[data-music], set by HomeAudio) */}
     <img className="hero-moon" src="/hero/moon.jpg" alt="" aria-hidden="true" decoding="async" />
+    {/* S2's background, played/paused by HomeAudio */}
+    <video className="hero-s2" src="/S2.mp4" muted loop playsInline preload="metadata" aria-hidden="true" />
     <div ref={box} className="char" data-on={on || undefined}>
       <div className="char-glow" aria-hidden="true" />
       <video ref={skull} className="char-skull" autoPlay muted loop playsInline preload="auto" poster="/hero/skull-poster.webp" aria-hidden="true">

@@ -19,6 +19,7 @@ import PixelTorch from '@/components/PixelTorch'
 import HeroCharacter from '@/components/HeroCharacter'
 import HomeAudio from '@/components/HomeAudio'
 import Preloader from '@/components/Preloader'
+import SmoothScroll from '@/components/SmoothScroll'
 import Mascot from '@/components/Mascot'
 import { projects } from '@/lib/projects'
 import { characters } from '@/lib/characters'
@@ -82,7 +83,19 @@ const navAfterClose=(e:React.MouseEvent)=>{
   document.body.append(v)
   setTimeout(()=>v.play().catch(go),wait)
 }
-function Hero(){return <section className="hero" id="home">
+// landonorris.com style scroll-linked scale: the hero pins for one screen of scroll while the scroll scrubs it
+// (content and all) down to a rounded card. Behind it the role marquee rises from the bottom; once the card is small
+// the signature draws in on the layer above, breaking out over the card's corner.
+function Hero(){
+  const ref=useRef<HTMLDivElement>(null)
+  const {scrollYProgress:p}=useScroll({target:ref,offset:['start start','end end']})
+  const scale=useTransform(p,[0,1],[1,.6]), borderRadius=useTransform(p,[0,1],[0,56])
+  const marqueeY=useTransform(p,[0,1],['60svh','0svh'])
+  const signClip=useTransform(p,[.6,.95],['inset(0% 100% 0% 0%)','inset(0% 0% 0% 0%)']), signOpacity=useTransform(p,[.55,.65],[0,1])
+  return <div ref={ref} className="hero-pin"><div className="hero-stick">
+  <motion.div className="hero-marquee" style={{y:marqueeY}}><RoleMarquee/></motion.div>
+  <motion.img src="/sign.png" alt="" aria-hidden="true" className="hero-sign" style={{clipPath:signClip,opacity:signOpacity}}/>
+  <motion.section style={{scale,borderRadius}} className="hero" id="home">
   <HeroCharacter/>
   <div className="hero-copy">
     {/* <FadeIn delay={.15} y={30}><h1>Aaditya<br/>Jaiswar</h1></FadeIn>
@@ -90,7 +103,7 @@ function Hero(){return <section className="hero" id="home">
     <FadeIn delay={.45} y={20}><p className="hero-intro">Building intelligent systems and unforgettable digital experiences.</p></FadeIn> */}
   </div>
   <HeroSocials/>
-</section>}
+</motion.section></div></div>}
 function Marquee() { const [offset,setOffset]=useState(0); const ref=useRef<HTMLElement>(null); useEffect(()=>{const fn=()=>{if(ref.current)setOffset((window.scrollY-ref.current.offsetTop+window.innerHeight)*.3)}; window.addEventListener('scroll',fn,{passive:true}); return()=>window.removeEventListener('scroll',fn)},[]); return <section ref={ref} className="marquee"><div className="marquee-row" style={{transform:`translateX(${offset-200}px)`}}>{[...gifs.slice(0,11),...gifs.slice(0,11),...gifs.slice(0,11)].map((src,i)=><img key={i} src={src} alt="Selected project" loading="lazy" />)}</div><div className="marquee-row" style={{transform:`translateX(-${offset-200}px)`}}>{[...gifs.slice(11),...gifs.slice(11),...gifs.slice(11)].map((src,i)=><img key={i} src={src} alt="Selected project" loading="lazy" />)}</div></section> }
 const roles=['Software Development Engineer','Full-Stack Developer','AI & LLM Engineer','Backend & API Developer','Cloud & DevOps Engineer','Mobile App Developer','IoT Developer']
 const socials:[string,string,React.ReactNode][]=[
@@ -145,7 +158,9 @@ function About() { return <section className="about" id="about"><img className="
 const services=[['01','Full-Stack Development','Building scalable web applications with React, Next.js, Node.js, Django, FastAPI, and modern databases, from responsive interfaces to production-ready backends.'],['02','AI & LLM Engineering','Developing intelligent AI solutions using LLMs, RAG, multi-agent systems, LangGraph, LangChain, Llama 3, and model fine-tuning with PEFT/LoRA.'],['03','Backend & API Development','Designing secure, high-performance backend systems with FastAPI, Django, Node.js, REST APIs, microservices, authentication, caching, and asynchronous processing.'],['04','Cloud & DevOps','Building reliable deployment pipelines and scalable infrastructure using Docker, Kubernetes, AWS, GCP, GitHub Actions, CI/CD, Redis, and cloud-native architectures.'],['05','IoT & Intelligent Systems','Developing real-time IoT solutions that connect devices, data, and intelligent analytics — including healthcare platforms, wearable data ingestion, and AI-powered applications.']]
 const groups=[['services','Services',services]] as const
 function Services(){return <section className="services">{groups.map(([id,heading,items])=><div key={id} id={id} className="service-group"><h2>{heading}</h2><div className="service-list">{items.map(([n,title,desc,meta]:readonly string[],i)=><FadeIn key={n} delay={i*.1}><article><strong>{n}</strong><div>{meta&&<span className="service-meta">{meta}</span>}<h3>{title}</h3><p>{desc}</p></div></article></FadeIn>)}</div></div>)}</section>}
-function ProjectCard({project,index}:{project:typeof projects[number];index:number}) { const ref=useRef<HTMLDivElement>(null); const {scrollYProgress}=useScroll({target:ref,offset:['start end','start start']}); const scale=useTransform(scrollYProgress,[0,1],[1,1-(projects.length-1-index)*.03]); const [n,cat,title,url,label]=project; return <div ref={ref} className="project-wrap" style={{top:`${index*28}px`}}><motion.article className="project-card" style={{scale}}><div className="project-top"><strong>{n}</strong><div><span>{cat}</span><h3>{title}</h3></div><a href={url} target="_blank" rel="noreferrer" className="live-button">{label} <ArrowUpRight size={16}/></a></div><div className="project-preview"><iframe src={url} title={`${title} live preview`} loading="lazy" tabIndex={-1} /></div></motion.article></div> }
+// sites that refuse to be iframed (CSP frame-ancestors) show their screenshot instead
+const noFrame:Record<string,string>={FeedingHands:'/projects/feeding-hands.png'}
+function ProjectCard({project,index}:{project:typeof projects[number];index:number}) { const ref=useRef<HTMLDivElement>(null); const {scrollYProgress}=useScroll({target:ref,offset:['start end','start start']}); const scale=useTransform(scrollYProgress,[0,1],[1,1-(projects.length-1-index)*.03]); const [n,cat,title,url,label]=project; return <div ref={ref} className="project-wrap" style={{top:`${index*28}px`}}><motion.article className="project-card" style={{scale}}><div className="project-top"><strong>{n}</strong><div><span>{cat}</span><h3>{title}</h3></div><a href={url} target="_blank" rel="noreferrer" className="live-button">{label} <ArrowUpRight size={16}/></a></div><div className="project-preview">{noFrame[title]?<img src={noFrame[title]} alt={`${title} homepage`} loading="lazy"/>:<iframe src={url} title={`${title} live preview`} loading="lazy" tabIndex={-1} />}</div></motion.article></div> }
 function Projects(){return <section className="projects" id="projects"><h2 className="hero-heading">Project</h2><div className="project-list">{projects.map((p,i)=><ProjectCard key={p[0]} project={p} index={i}/>)}</div></section>}
 // paint the footer with the video's own top-edge colours, read from the frames the browser actually renders,
 // so the shade above the video stays in sync (decoder colour differences and any colour change in the clip included)
@@ -188,4 +203,4 @@ function Footer(){const{sectionRef,videoRef}=useEdgeSync();return <section ref={
 export default function Page(){
 // old /#home bookmarks: drop the hash (the hero is the top of the page anyway)
 useEffect(()=>{if(location.hash==='#home')history.replaceState(null,'',location.pathname+location.search)},[])
-return <main onClick={onPageClick}><Preloader/><Mascot/><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email')} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><RoleMarquee/><About/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}
+return <main onClick={onPageClick}><SmoothScroll/><Preloader/><Mascot/><SiteMenu items={navItems} socials={socials.filter(([n])=>n!=='Phone'&&n!=='Email')} small={menuSmall} cta={{label:"Let's talk",href:'/contact'}} onNavigate={navAfterClose}/><HomeAudio src="/hero/home-theme.mp3"/><Hero/><About/><RoleMarquee/><Explore/><SkillBubbles decor={skillDecor}/><Services/><Projects/>{/* <Marquee/> */}<Footer/></main>}

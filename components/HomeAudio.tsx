@@ -10,6 +10,7 @@ export default function HomeAudio({ src }: { src: string }) {
   const [muted, setMuted] = useState(false)
   const [vol, setVol] = useState(0.5)
   const [playing, setPlaying] = useState(false)
+  const s2Ref = useRef(false) // read by the play/pause listener below
 
   useEffect(() => {
     const a = audio.current!
@@ -20,9 +21,15 @@ export default function HomeAudio({ src }: { src: string }) {
       if (saved >= 0 && saved <= 1) v = saved
     } catch {}
     setMuted(off); setVol(v); a.volume = v
-    // while the music plays the hero swaps its background for the moon (CSS: html[data-music])
+    // while the music plays the hero swaps its background for the moon, or S2.mp4 on S2 (CSS: html[data-music]),
+    // and HeroCharacter stops painting the cursor trail
     const root = document.documentElement
-    const sync = () => { setPlaying(!a.paused); if (a.paused) delete root.dataset.music; else root.dataset.music = '' }
+    const sync = () => {
+      setPlaying(!a.paused)
+      if (a.paused) delete root.dataset.music; else root.dataset.music = s2Ref.current ? 's2' : ''
+      const v = document.querySelector<HTMLVideoElement>('.hero-s2')
+      if (v) { if (!a.paused && s2Ref.current) v.play().catch(() => {}); else v.pause() }
+    }
     a.addEventListener('play', sync); a.addEventListener('pause', sync)
     const cleanup = () => { a.removeEventListener('play', sync); a.removeEventListener('pause', sync); delete root.dataset.music }
     if (off) return cleanup
@@ -54,7 +61,8 @@ export default function HomeAudio({ src }: { src: string }) {
     if (next === s2) return toggle()
     const f = document.querySelector<HTMLImageElement>('.char-face') // HeroCharacter re-uploads the texture on load
     if (f) f.src = next ? '/hero/face-s2.webp' : '/hero/face-cutout.webp'
-    audio.current!.src = next ? encodeURI('/mix_3m12s (audio-joiner.com).mp3') : src
+    s2Ref.current = next
+    audio.current!.src = next ? '/mix_final.mp3' : src
     setS2(next)
     if (vol === 0) change(0.5)
     setMute(false)
