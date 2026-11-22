@@ -2,19 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-// Home-page music. Browsers block audible autoplay until the visitor interacts, so if play() is
-// refused we start on the first click/tap/key. Mute is remembered for the next visit; volume is fixed at 50%.
+// Home-page music. Never autoplays: it only starts when the visitor clicks S1 or S2 (d4vd, the ghost, introduces them).
+// Volume is fixed at 50%.
 export default function HomeAudio({ src }: { src: string }) {
   const audio = useRef<HTMLAudioElement>(null)
-  const [muted, setMuted] = useState(false)
   const [playing, setPlaying] = useState(false)
   const s2Ref = useRef(false) // read by the play/pause listener below
 
   useEffect(() => {
     const a = audio.current!
-    let off = false
-    try { off = localStorage.getItem('home-audio-muted') === '1' } catch {}
-    setMuted(off); a.volume = 0.5
+    a.volume = 0.5
     // while the music plays the hero swaps its background for the moon, or S2.mp4 on S2 (CSS: html[data-music]),
     // and HeroCharacter stops painting the cursor trail
     const root = document.documentElement
@@ -25,25 +22,13 @@ export default function HomeAudio({ src }: { src: string }) {
       if (v) { if (!a.paused && s2Ref.current) v.play().catch(() => {}); else v.pause() }
     }
     a.addEventListener('play', sync); a.addEventListener('pause', sync)
-    const cleanup = () => { a.removeEventListener('play', sync); a.removeEventListener('pause', sync); delete root.dataset.music }
-    if (off) return cleanup
-    // clicks on the control itself are left to its own handler
-    const start = (e: Event) => { if (!(e.target instanceof Element && e.target.closest('.home-audio'))) a.play().then(stop, () => {}) }
-    const stop = () => ['pointerdown', 'keydown'].forEach(t => removeEventListener(t, start))
-    a.play().catch(() => ['pointerdown', 'keydown'].forEach(t => addEventListener(t, start)))
-    return () => { stop(); a.pause(); cleanup() }
+    return () => { a.removeEventListener('play', sync); a.removeEventListener('pause', sync); a.pause(); delete root.dataset.music }
   }, [])
 
-  const save = (k: string, v: string) => { try { localStorage.setItem(k, v) } catch {} }
-  const setMute = (next: boolean) => {
-    const a = audio.current!
-    setMuted(next)
-    if (next) a.pause(); else a.play().catch(() => {})
-    save('home-audio-muted', next ? '1' : '0')
-  }
+  const play = () => audio.current!.play().catch(() => {})
   // S1 / S2 are two "sides": clicking the inactive one switches face + track; clicking the active one plays / pauses
   const [s2, setS2] = useState(false)
-  const toggle = () => setMute(!muted && !audio.current!.paused)
+  const toggle = () => { if (audio.current!.paused) play(); else audio.current!.pause() }
   const side = (next: boolean) => {
     if (next === s2) return toggle()
     const f = document.querySelector<HTMLImageElement>('.char-face') // HeroCharacter re-uploads the texture on load
@@ -51,7 +36,7 @@ export default function HomeAudio({ src }: { src: string }) {
     s2Ref.current = next
     audio.current!.src = next ? '/mix_final.mp3' : src
     setS2(next)
-    setMute(false)
+    play()
   }
 
   return <div className="home-audio">
