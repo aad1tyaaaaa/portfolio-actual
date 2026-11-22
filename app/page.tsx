@@ -64,13 +64,13 @@ const onPageClick=(e:React.MouseEvent)=>{
 }
 // pages that open with a fullscreen intro video
 const intros:Record<string,string>={'/resume':'/resume-intro.mp4','/achievements':'/achievement.mp4'}
-// let the menu curtain close before leaving; plain/modified clicks and new-tab links pass through
-const navAfterClose=(e:React.MouseEvent)=>{
+// leave for a link after `wait` ms, through its intro video if it has one; plain/modified clicks and new-tab links pass through
+const navWithIntro=(e:React.MouseEvent,delay:number)=>{
   const a=(e.target as HTMLElement).closest('a')
   if(!a||a.target==='_blank'||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return
   e.preventDefault()
   const go=()=>{location.href=a.href}
-  const wait=matchMedia('(prefers-reduced-motion: reduce)').matches?0:700
+  const wait=matchMedia('(prefers-reduced-motion: reduce)').matches?0:delay
   // same-page links (Home, #about): scroll once the curtain is up, no reload, no hash in the URL
   if(samePage(a)){setTimeout(()=>scrollToLink(a),wait);return}
   const intro=intros[a.pathname]
@@ -86,6 +86,10 @@ const navAfterClose=(e:React.MouseEvent)=>{
   document.body.append(v)
   setTimeout(()=>v.play().catch(go),wait)
 }
+// from the menu: let its curtain close first
+const navAfterClose=(e:React.MouseEvent)=>navWithIntro(e,700)
+// quick links under the About text (same intros as the menu, no curtain to wait for)
+const aboutLinks=[['Experience','/experience',Briefcase],['Achievements','/achievements',Trophy],['Resume','/resume',FileText]] as const
 // landonorris.com style scroll-linked scale: the hero pins for one screen of scroll while the scroll scrubs it
 // (content and all) down to a rounded card. Behind it the role marquee rises from the bottom,
 // and the name fills the bands above and below it.
@@ -171,7 +175,9 @@ function About() { return <section className="about" id="about"><div className="
     {/* stickers ride on the card: a smiley slapped on its corner, a cursor resting on the Contact button */}
     <img className="deco object" src={decor.object} alt="" draggable={false}/><img className="deco deco-group" src={decor.group} alt="" draggable={false}/>
   </Lanyard>
-  <div className="about-content"><FadeIn><div className="about-head"><h2 className="hero-heading">About me</h2><img className="deco lego" src={decor.lego} alt=""/></div></FadeIn><AnimatedText/></div>
+  <div className="about-content"><FadeIn><div className="about-head"><h2 className="hero-heading">About me</h2><img className="deco lego" src={decor.lego} alt=""/></div></FadeIn><AnimatedText/>
+    <nav className="about-links" aria-label="More about me">{aboutLinks.map(([label,href,Icon],i)=><a key={href} href={href} onClick={e=>navWithIntro(e,0)} className={i===aboutLinks.length-1?'contact-button':'about-link'}><Icon size={16}/>{label}</a>)}</nav>
+  </div>
 </div></section> }
 const services=[['01','Full-Stack Development','Building scalable web applications with React, Next.js, Node.js, Django, FastAPI, and modern databases, from responsive interfaces to production-ready backends.'],['02','AI & LLM Engineering','Developing intelligent AI solutions using LLMs, RAG, multi-agent systems, LangGraph, LangChain, Llama 3, and model fine-tuning with PEFT/LoRA.'],['03','Backend & API Development','Designing secure, high-performance backend systems with FastAPI, Django, Node.js, REST APIs, microservices, authentication, caching, and asynchronous processing.'],['04','Cloud & DevOps','Building reliable deployment pipelines and scalable infrastructure using Docker, Kubernetes, AWS, GCP, GitHub Actions, CI/CD, Redis, and cloud-native architectures.'],['05','IoT & Intelligent Systems','Developing real-time IoT solutions that connect devices, data, and intelligent analytics — including healthcare platforms, wearable data ingestion, and AI-powered applications.']]
 const groups=[['services','Services',services]] as const
