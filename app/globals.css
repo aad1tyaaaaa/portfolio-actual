@@ -260,11 +260,14 @@ html{scrollbar-gutter:stable}
 .about .about-content h2,.about .animated-text{text-align:left}
 .about .about-content h2{font-size:clamp(2.4rem,6vw,5.5rem);white-space:nowrap}
 /* the moon is the hook: the strap runs from its centre down to the clip, and the swing pivots on it */
-.lanyard{--strap:130px;--moon:clamp(70px,7vw,100px);position:relative;display:flex;justify-content:center;padding-top:var(--strap)}
+.lanyard{--strap:130px;--moon:clamp(70px,7vw,100px);position:relative;z-index:3;display:flex;justify-content:center;padding-top:var(--strap)}
 .lanyard>.moon{top:calc(var(--moon) / -2);left:50%;bottom:auto;right:auto;width:var(--moon);margin-left:calc(var(--moon) / -2);rotate:-14deg;z-index:3;animation:sk-fade .8s ease both}
-.lanyard-swing{position:relative;display:flex;flex-direction:column;align-items:center;transform-origin:50% calc(var(--strap) * -1);animation:lanyard-swing 3.4s ease-in-out infinite alternate}
+/* --pull / --ang come from Lanyard.tsx while the card is dragged: the card drops by --pull and the pivot moves up by the
+   same amount, so it stays on the moon; the strap grows to match */
+.lanyard-swing{position:relative;display:flex;flex-direction:column;align-items:center;translate:0 var(--pull,0px);transform-origin:50% calc((var(--strap) + var(--pull,0px)) * -1);animation:lanyard-swing 3.4s ease-in-out infinite alternate;cursor:grab;touch-action:none;user-select:none}
+.lanyard-swing[data-drag]{animation:none;rotate:var(--ang,0deg);cursor:grabbing}
 @keyframes lanyard-swing{from{rotate:-1.3deg}to{rotate:1.3deg}}
-.lanyard-strap{position:absolute;bottom:calc(100% - 8px);left:50%;width:24px;height:var(--strap);translate:-50% 0;background:linear-gradient(90deg,#3a0b52,#b600a8 45%,#e28bed 50%,#b600a8 55%,#3a0b52);box-shadow:inset 2px 0 0 #ffffff1f,inset -2px 0 0 #0000004d}
+.lanyard-strap{position:absolute;bottom:calc(100% - 8px);left:50%;width:24px;height:calc(var(--strap) + var(--pull,0px));translate:-50% 0;background:linear-gradient(90deg,#3a0b52,#b600a8 45%,#e28bed 50%,#b600a8 55%,#3a0b52);box-shadow:inset 2px 0 0 #ffffff1f,inset -2px 0 0 #0000004d}
 .lanyard-clip{position:relative;z-index:2;width:48px;height:26px;margin-bottom:-12px;border-radius:8px;background:linear-gradient(180deg,#f4f4f7,#9b9aa8);box-shadow:0 6px 14px #000a,inset 0 1px 0 #fff}
 .lanyard-clip::after{content:"";position:absolute;left:50%;bottom:6px;width:22px;height:5px;translate:-50% 0;border-radius:3px;background:#2a2733}
 .lanyard .profile-card{width:320px}
@@ -280,3 +283,8 @@ html{scrollbar-gutter:stable}
 .about-head>.lego{position:static;flex:none;width:clamp(44px,4.6vw,80px);rotate:12deg}
 .about-grid .about-content{width:100%;max-width:540px}
 
+
+/* d4vd's intro (Mascot.tsx) pulses a glow on whatever it's talking about */
+[data-ghost-point]{border-radius:999px;animation:ghost-point 1.1s ease-out infinite}
+@keyframes ghost-point{0%{box-shadow:0 0 0 0 #e28bedcc}100%{box-shadow:0 0 0 14px #e28bed00}}
+@media(prefers-reduced-motion:reduce){[data-ghost-point]{animation:none;box-shadow:0 0 0 3px #e28bed}}
