@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValueEvent, MotionValue } from 'framer-motion'
 import { ArrowUpRight, House, User, Briefcase, Trophy, FolderKanban, GraduationCap, FileText, Mail } from 'lucide-react'
 import SkillBubbles from '@/components/SkillBubbles'
 import SiteMenu from '@/components/SiteMenu'
@@ -84,17 +84,23 @@ const navAfterClose=(e:React.MouseEvent)=>{
   setTimeout(()=>v.play().catch(go),wait)
 }
 // landonorris.com style scroll-linked scale: the hero pins for one screen of scroll while the scroll scrubs it
-// (content and all) down to a rounded card. Behind it the role marquee rises from the bottom; once the card is small
-// the signature draws in on the layer above, breaking out over the card's corner.
+// (content and all) down to a rounded card. Behind it the role marquee rises from the bottom,
+// and the name fills the bands above and below it.
 function Hero(){
   const ref=useRef<HTMLDivElement>(null)
   const {scrollYProgress:p}=useScroll({target:ref,offset:['start start','end end']})
   const scale=useTransform(p,[0,1],[1,.6]), borderRadius=useTransform(p,[0,1],[0,56])
   const marqueeY=useTransform(p,[0,1],['60svh','0svh'])
-  const signClip=useTransform(p,[.6,.95],['inset(0% 100% 0% 0%)','inset(0% 0% 0% 0%)']), signOpacity=useTransform(p,[.55,.65],[0,1])
+  // backdrop for the space the card leaves: the name in huge type above / below it
+  const nameOpacity=useTransform(p,[.35,.95],[0,1]), nameScale=useTransform(p,[.35,1],[1.15,1])
+  // the filled AADITYA passes under the navbar's white "aJ": flag it so CSS turns the mark dark only while it's over the pink
+  const first=useRef<HTMLSpanElement>(null)
+  const {scrollY}=useScroll()
+  useMotionValueEvent(scrollY,'change',()=>{const r=first.current?.getBoundingClientRect();document.documentElement.toggleAttribute('data-name-under-mark',!!r&&nameOpacity.get()>.5&&r.top<60&&r.bottom>30)})
+  useEffect(()=>()=>document.documentElement.removeAttribute('data-name-under-mark'),[])
   return <div ref={ref} className="hero-pin"><div className="hero-stick">
+  <motion.div className="hero-name" aria-hidden="true" style={{opacity:nameOpacity,scale:nameScale}}><span ref={first}>Aaditya</span><span>Jaiswar</span></motion.div>
   <motion.div className="hero-marquee" style={{y:marqueeY}}><RoleMarquee/></motion.div>
-  <motion.img src="/sign.png" alt="" aria-hidden="true" className="hero-sign" style={{clipPath:signClip,opacity:signOpacity}}/>
   <motion.section style={{scale,borderRadius}} className="hero" id="home">
   <HeroCharacter/>
   <div className="hero-copy">

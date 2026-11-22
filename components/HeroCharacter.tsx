@@ -115,10 +115,13 @@ export default function HeroCharacter() {
       uTime: { value: 0 }, uFull: { value: 0 }, uAspect: { value: 16 / 9 }, uBox: { value: [0, 0, 1, 1] } } }) })
 
     const resize = () => {
+      // size from layout (offsetWidth/Height), not getBoundingClientRect: the home hero is scaled down on scroll, and a resize
+      // while it's scaled would shrink the canvas and then the transform would shrink it again (character drifts up-left).
+      // The box ratios below are unaffected by a uniform scale, so the rects are fine there.
       const hr = hero.getBoundingClientRect(), b = el.getBoundingClientRect()
-      const { width, height } = hr
+      const width = hero.offsetWidth, height = hero.offsetHeight
       renderer.setSize(width, height)
-      comp.program.uniforms.uBox.value = [(b.left - hr.left) / width, (hr.bottom - b.bottom) / height, b.width / width, b.height / height]
+      comp.program.uniforms.uBox.value = [(b.left - hr.left) / hr.width, (hr.bottom - b.bottom) / hr.height, b.width / hr.width, b.height / hr.height]
       // trail at ~1/4 res: cheap, and the bilinear upscale softens it before thresholding
       const w = Math.max(2, Math.round(width / 4)), h = Math.max(2, Math.round(height / 4))
       read = new RenderTarget(gl, { width: w, height: h, depth: false })

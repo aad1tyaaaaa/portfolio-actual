@@ -40,14 +40,17 @@ export default function SiteMenu({ items, socials, small, current = 0, cta, onNa
     return () => { root.style.overflow = ''; clearTimeout(t); removeEventListener('keydown', esc) }
   }, [open])
 
-  // hide the top bar (and the music control, via html[data-bar-hidden]) while scrolling down, bring it back on scroll up
+  // the top bar (and the music control, via html[data-bar-hidden]) stays put through the hero and About;
+  // past About it hides while scrolling down and comes back on scroll up
   useEffect(() => {
     const root = document.documentElement
     let last = scrollY
     const onScroll = () => {
       const y = scrollY, d = y - last
       if (Math.abs(d) < 6) return
-      if (y > 80 && d > 0) root.dataset.barHidden = ''
+      const about = document.getElementById('about')
+      const pastAbout = !about || about.getBoundingClientRect().bottom < 0
+      if (pastAbout && d > 0) root.dataset.barHidden = ''
       else delete root.dataset.barHidden
       last = y
     }
