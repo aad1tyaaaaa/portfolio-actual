@@ -155,7 +155,7 @@ function HeroSocials(){
   </>
 }
 function RoleMarquee(){return <section className="role-marquee" aria-label={roles.join(', ')}><div className="role-track" aria-hidden="true">{[0,1].map(k=><div key={k}>{roles.map(r=><span key={r}>{r}<i>✦</i></span>)}</div>)}</div></section>}
-const aboutText = "I’m a Software Development Engineer passionate about full-stack development, AI, and building scalable products. I enjoy turning  complex ideas into intelligent, practical experiences using modern technologies. Let’s build something incredible together!"
+const aboutText = "I’m a Software Development Engineer passionate about full-stack development, AI, IoT & Intelligent Systems, and building scalable products. I enjoy turning complex ideas into intelligent, practical experiences using modern technologies. Let’s build something incredible together!"
 function AnimatedText() { return <BlockReveal text={aboutText} className="animated-text"/> }
 const exploreItems=[
   // ponytail: no links/images yet; add link + image per row once those pages/visuals exist
